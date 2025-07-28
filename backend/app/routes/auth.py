@@ -1,5 +1,7 @@
 from fastapi import APIRouter, HTTPException, Depends, status
+from app.core.security import verify_password, create_access_token
 from fastapi.security import OAuth2PasswordBearer
+from fastapi.security import OAuth2PasswordRequestForm
 from sqlalchemy.orm import Session
 from jose import jwt, JWTError
 from datetime import timedelta
@@ -64,3 +66,15 @@ def get_current_vendor(token: str = Depends(oauth2_scheme), db: Session = Depend
     if vendor is None:
         raise credentials_exception
     return vendor
+@router.post("/login")
+def login_vendor(form_data: OAuth2PasswordRequestForm = Depends(), db: Session = Depends(get_db)):
+    vendor = db.query(Vendor).filter(Vendor.email == form_data.username).first()
+    if not vendor or not verify_password(form_data.password, vendor.password_hash):
+        raise HTTPException(status_code=404, detail="Invalid credentials")
+
+    access_token_expires = timedelta(minutes=60)
+    access_token = create_access_token(
+        data={"sub": str(vendor.id)},
+        expires_delta=access_token_expires
+    )
+    return {"access_token": access_token, "token_type": "bearer"}

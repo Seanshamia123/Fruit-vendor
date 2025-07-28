@@ -10,5 +10,8 @@ class Product(Base):
     name = Column(String(255), nullable=False)
     unit = Column(String(50), nullable=False)          # e.g., kg, piece, batch
     variation = Column(String(50), nullable=True)      # e.g., size, color
-    type = Column(String(50), nullable=False)          # quick-sell or manual
+    sale_type = Column(String(50), nullable=False)  # quick-sell or manual
     is_active = Column(Boolean, default=True)
+
+    def __repr__(self):
+        return f"<Product(name={self.name}, vendor={self.vendor_id})>"

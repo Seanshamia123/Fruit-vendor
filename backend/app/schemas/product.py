@@ -1,11 +1,11 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 from typing import Optional
 
 class ProductBase(BaseModel):
-    name: str
-    unit: str
-    variation: Optional[str] = None
-    type: str  # "quick-sell" or "manual"
+    name: str = Field(..., example="Apples")
+    unit: str = Field(..., example="kg")
+    variation: Optional[str] = Field(None, example="Large")
+    sale_type: str
 
 class ProductCreate(ProductBase):
     pass
@@ -15,4 +15,4 @@ class ProductOut(ProductBase):
     is_active: bool
 
     class Config:
-        orm_mode = True
+        from_attributes = True
