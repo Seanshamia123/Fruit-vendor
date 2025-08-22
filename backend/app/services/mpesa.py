@@ -1,74 +1,110 @@
-# backend/app/services/mpesa.py
 import os
 import base64
+import datetime as dt
 import requests
-from datetime import datetime
-from dotenv import load_dotenv
+from typing import Dict, Any
+from urllib.parse import urlparse
 
-load_dotenv()
-
-MPESA_ENV = os.getenv("MPESA_ENV", "sandbox").lower()
-BASE_URL = "https://sandbox.safaricom.co.ke" if MPESA_ENV == "sandbox" else "https://api.safaricom.co.ke"
-
+# ---- ENV ----
+DARAJA_BASE = os.getenv("MPESA_BASE_URL", "https://sandbox.safaricom.co.ke")
 CONSUMER_KEY = os.getenv("MPESA_CONSUMER_KEY")
 CONSUMER_SECRET = os.getenv("MPESA_CONSUMER_SECRET")
-SHORTCODE = os.getenv("MPESA_SHORTCODE")       # BusinessShortCode / Paybill
-PASSKEY = os.getenv("MPESA_PASSKEY")           # Lipa Na Mpesa passkey
-CALLBACK_URL = os.getenv("MPESA_CALLBACK_URL") # https://<ngrok>.io/mpesa/callback
+SHORTCODE = os.getenv("MPESA_SHORTCODE", "174379")
+PASSKEY = os.getenv("MPESA_PASSKEY")
+CALLBACK_URL = os.getenv("MPESA_CALLBACK_URL")
+TIMEOUT = int(os.getenv("MPESA_TIMEOUT", "30"))
 
-TIMEOUT = 20  # seconds for HTTP calls
+# ---- ENDPOINTS ----
+OAUTH_URL = f"{DARAJA_BASE}/oauth/v1/generate?grant_type=client_credentials"
+STK_URL = f"{DARAJA_BASE}/mpesa/stkpush/v1/processrequest"
 
-def _timestamp() -> str:
-    return datetime.utcnow().strftime("%Y%m%d%H%M%S")
+def _now_ts() -> str:
+    return dt.datetime.now().strftime("%Y%m%d%H%M%S")  # YYYYMMDDHHMMSS
 
-def generate_password(shortcode: str = SHORTCODE, passkey: str = PASSKEY, ts: str | None = None) -> tuple[str,str]:
-    """
-    Returns (password_base64, timestamp)
-    Password = base64(BusinessShortCode + Passkey + Timestamp)
-    Timestamp format: YYYYMMDDHHMMSS
-    See Daraja docs: password is base64(shortcode+passkey+timestamp).
-    """
-    ts = ts or _timestamp()
-    raw = f"{shortcode}{passkey}{ts}"
-    encoded = base64.b64encode(raw.encode()).decode()
-    return encoded, ts
+def _password(ts: str) -> str:
+    raw = f"{SHORTCODE}{PASSKEY}{ts}".encode()
+    return base64.b64encode(raw).decode()
 
-def get_oauth_token() -> str:
-    """
-    Request OAuth token from Daraja OAuth endpoint.
-    Uses HTTP Basic auth (consumer_key:consumer_secret).
-    Endpoint: /oauth/v1/generate?grant_type=client_credentials
-    Token typically expires in ~1 hour.
-    """
-    url = f"{BASE_URL}/oauth/v1/generate?grant_type=client_credentials"
-    resp = requests.get(url, auth=(CONSUMER_KEY, CONSUMER_SECRET), timeout=TIMEOUT)
-    resp.raise_for_status()
-    j = resp.json()
-    return j["access_token"]
+def _token() -> str:
+    r = requests.get(OAUTH_URL, auth=(CONSUMER_KEY, CONSUMER_SECRET), timeout=TIMEOUT)
+    r.raise_for_status()
+    return r.json()["access_token"]
 
-def stk_push(phone_number: str, amount: int|float, account_reference: str, transaction_desc: str = "Payment") -> dict:
-    """
-    Initiate an STK Push (Lipa na M-Pesa Online).
-    - phone_number must be in international Kenya format without '+' e.g. 2547XXXXXXXX
-    - returns Daraja response JSON (contains MerchantRequestID, CheckoutRequestID if accepted)
-    """
-    token = get_oauth_token()
-    password, ts = generate_password()
+def _normalize_msisdn(msisdn: str) -> str:
+    s = str(msisdn).strip().replace(" ", "")
+    if s.startswith("+"): s = s[1:]
+    if s.startswith("07"): s = "254" + s[1:]
+    return s
+
+def _validated_callback() -> str:
+    """Ensure callback URL is https and well-formed; trim stray spaces."""
+    cb = (CALLBACK_URL or "").strip()
+    if not cb:
+        raise ValueError("MPESA_CALLBACK_URL is not set")
+    p = urlparse(cb)
+    if p.scheme.lower() != "https" or not p.netloc:
+        raise ValueError(f"MPESA_CALLBACK_URL must be https and public. Got: {cb!r}")
+    # optional: enforce path ends with /mpesa/callback to match your router
+    if not p.path.endswith("/mpesa/callback"):
+        raise ValueError(f"MPESA_CALLBACK_URL path should end with /mpesa/callback. Got: {cb!r}")
+    return cb
+
+def stk_push(
+    phone: str | None = None,
+    phone_number: str | None = None,
+    amount: int = 1,
+    account_ref: str | None = None,
+    account_reference: str | None = None,
+    desc: str | None = None,
+    transaction_desc: str | None = None,
+) -> Dict[str, Any]:
+    # Accept both router shapes
+    phone_val = phone or phone_number
+    if not phone_val:
+        raise ValueError("Missing phone / phone_number")
+    phone_val = _normalize_msisdn(phone_val)
+
+    acc_ref = (account_ref or account_reference or "FRUITS")[:12]
+    descr  = (desc or transaction_desc or "Payment")[:13]
+    cb_url = _validated_callback()
+
+    ts = _now_ts()
     payload = {
         "BusinessShortCode": SHORTCODE,
-        "Password": password,
+        "Password": _password(ts),
         "Timestamp": ts,
         "TransactionType": "CustomerPayBillOnline",
         "Amount": int(amount),
-        "PartyA": phone_number,
+        "PartyA": phone_val,
         "PartyB": SHORTCODE,
-        "PhoneNumber": phone_number,
-        "CallBackURL": CALLBACK_URL,
-        "AccountReference": account_reference,
-        "TransactionDesc": transaction_desc
+        "PhoneNumber": phone_val,
+        "CallBackURL": cb_url,
+        "AccountReference": acc_ref,
+        "TransactionDesc": descr,
     }
-    headers = {"Authorization": f"Bearer {token}", "Content-Type": "application/json"}
-    url = f"{BASE_URL}/mpesa/stkpush/v1/processrequest"
-    resp = requests.post(url, json=payload, headers=headers, timeout=TIMEOUT)
-    resp.raise_for_status()
-    return resp.json()
+
+    headers = {
+        "Authorization": f"Bearer {_token()}",
+        "Content-Type": "application/json",
+    }
+
+    # Helpful debug
+    print("STK DEBUG:", {"CallBackURL": cb_url, "Timestamp": ts})
+
+    r = requests.post(STK_URL, json=payload, headers=headers, timeout=TIMEOUT)
+
+    # Log Daraja response (no secrets)
+    try:
+        dbg_body = r.json()
+    except Exception:
+        dbg_body = r.text
+    print("DARAJA DEBUG:", {"status": r.status_code, "body": dbg_body})
+
+    if r.status_code != 200:
+        try:
+            err = r.json()
+        except Exception:
+            err = r.text
+        raise RuntimeError(f"Daraja {r.status_code}: {err}")
+
+    return r.json()

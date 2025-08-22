@@ -122,3 +122,10 @@ async def mpesa_callback(request: Request, db: Session = Depends(get_db)):
 
     # Daraja expects you to respond with HTTP 200. Return a small JSON as acknowledgement.
     return {"ResultCode": 0, "ResultDesc": "Accepted"}
+
+@router.post("/callback", status_code=status.HTTP_200_OK)
+async def mpesa_callback(request: Request):
+    data = await request.json()
+    print("CALLBACK RAW >>>", data)   # <- add this single line
+    ...
+    return {"ResultCode": 0, "ResultDesc": "Accepted"}
