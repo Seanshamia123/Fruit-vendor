@@ -1,5 +1,5 @@
 # backend/app/models/sale.py
-from sqlalchemy import Column, Integer, Float, ForeignKey, DateTime
+from sqlalchemy import Column, Integer, Float, ForeignKey, DateTime, String
 from sqlalchemy.orm import relationship
 from app.database import Base
 from datetime import datetime
@@ -15,8 +15,13 @@ class Sale(Base):
     unit_price = Column(Float, nullable=False)
     total_price = Column(Float, nullable=False)
 
+    reference_no = Column(String(64), unique=True, index=True, nullable=True)  
+    # ↑ stores MpesaReceiptNumber or internal reference
+    #   unique=True → no duplicates ever
+    #   index=True → fast lookups during callback reconciliation
+
     timestamp = Column(DateTime, default=datetime.utcnow)
 
     # Relationships
-    vendor = relationship("Vendor", back_populates="sales")   # <-- this was missing
+    vendor = relationship("Vendor", back_populates="sales")
     product = relationship("Product", back_populates="sales")
