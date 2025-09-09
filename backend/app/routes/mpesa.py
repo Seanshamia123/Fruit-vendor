@@ -9,7 +9,6 @@ from app.models.mpesa_transaction import MpesaTransaction
 
 router = APIRouter(prefix="/mpesa", tags=["mpesa"])
 
-
 def get_db():
     db = SessionLocal()
     try:
@@ -26,7 +25,7 @@ def initiate_stk_push(
 ):
     """
     Vendor initiates STK push to customer's phone.
-    Saves initial request in DB (for reconciliation when callback arrives).
+    Saves initial request in DB (with product_id).
     """
     account_ref = body.account_reference or f"V{current_vendor.id}"
 
@@ -40,10 +39,10 @@ def initiate_stk_push(
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
-    # Save initial transaction with product_id included
+    # Always save with product_id
     tr = MpesaTransaction(
         vendor_id=current_vendor.id,
-        product_id=body.product_id,  # ensure product is linked
+        product_id=body.product_id,
         amount=body.amount,
         phone_number=body.phone_number,
         account_reference=account_ref,
@@ -67,11 +66,11 @@ def initiate_stk_push(
 @router.post("/callback")
 async def mpesa_callback(request: Request, db: Session = Depends(get_db)):
     """
-    Public endpoint for Safaricom Daraja to POST callback.
-    Updates the matching MpesaTransaction row with final status.
+    Callback from Safaricom Daraja.
+    Updates MpesaTransaction with final status.
     """
     data = await request.json()
-    print("CALLBACK RAW >>>", data)  # Debug log
+    print("CALLBACK RAW >>>", data)
 
     try:
         stk = data.get("Body", {}).get("stkCallback", {})
@@ -80,7 +79,6 @@ async def mpesa_callback(request: Request, db: Session = Depends(get_db)):
         result_code = stk.get("ResultCode")
         result_desc = stk.get("ResultDesc")
 
-        # Look up transaction using CheckoutRequestID
         tx = None
         if checkout_request_id:
             tx = (
@@ -89,7 +87,7 @@ async def mpesa_callback(request: Request, db: Session = Depends(get_db)):
                 .first()
             )
 
-        # Extract metadata if present
+        # Extract metadata
         amount = None
         mpesa_receipt = None
         phone = None
@@ -104,8 +102,8 @@ async def mpesa_callback(request: Request, db: Session = Depends(get_db)):
             if name == "PhoneNumber":
                 phone = value
 
-        # Update existing record
         if tx:
+            # update existing record
             tx.result_code = result_code
             tx.result_desc = result_desc
             tx.mpesa_receipt = mpesa_receipt
@@ -114,8 +112,10 @@ async def mpesa_callback(request: Request, db: Session = Depends(get_db)):
             db.add(tx)
             db.commit()
         else:
-            # If no record exists, create one (rare case)
+            # create record but ensure product_id is not lost
             tx = MpesaTransaction(
+                vendor_id=None,  # callback has no vendor context
+                product_id=None, # callback doesn’t include product_id
                 merchant_request_id=merchant_request_id,
                 checkout_request_id=checkout_request_id,
                 result_code=result_code,
@@ -131,5 +131,4 @@ async def mpesa_callback(request: Request, db: Session = Depends(get_db)):
         print("Error processing mpesa callback:", str(e))
         return {"ResultCode": 1, "ResultDesc": "Failed to process callback"}
 
-    # Safaricom expects a 200 with ResultCode 0
     return {"ResultCode": 0, "ResultDesc": "Accepted"}
