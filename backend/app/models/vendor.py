@@ -18,3 +18,10 @@ class Vendor(Base):
     sales = relationship("Sale", back_populates="vendor", cascade="all, delete-orphan")
     inventories = relationship("Inventory", back_populates="vendor", cascade="all, delete-orphan")
     mpesa_transactions = relationship("MpesaTransaction", back_populates="vendor", cascade="all, delete-orphan")
+
+    preferences = relationship(
+        "VendorPreference",
+        back_populates="vendor",
+        cascade="all, delete-orphan",
+        uselist=False  # one preference set per vendor
+    )

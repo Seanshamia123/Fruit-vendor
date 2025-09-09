@@ -22,5 +22,17 @@ class Product(Base):
     inventories = relationship("Inventory", back_populates="product", cascade="all, delete-orphan")
     mpesa_transactions = relationship("MpesaTransaction", back_populates="product", cascade="all, delete-orphan")
 
+    pricings = relationship(
+        "ProductPricing",
+        back_populates="product",
+        cascade="all, delete-orphan"
+    )
+
+    bonus_rules = relationship(
+        "BonusRule",
+        back_populates="product",
+        cascade="all, delete-orphan"
+    )
+
     def __repr__(self):
         return f"<Product(name={self.name}, vendor_id={self.vendor_id})>"

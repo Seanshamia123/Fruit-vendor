@@ -22,6 +22,9 @@ class Sale(Base):
 
     timestamp = Column(DateTime, default=datetime.utcnow)
 
+    payment_type = Column(String(50), nullable=False, default="Cash")  # Cash / Mpesa / Other
+    cart_id = Column(Integer, ForeignKey("carts.id"), nullable=True)
+
     # Relationships
     vendor = relationship("Vendor", back_populates="sales")
     product = relationship("Product", back_populates="sales")
