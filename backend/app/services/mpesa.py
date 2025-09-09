@@ -1,6 +1,7 @@
+# backend/app/services/mpesa.py
 import os
 import base64
-import datetime as dt
+from datetime import datetime, timezone, timedelta
 import requests
 from typing import Dict, Any
 from urllib.parse import urlparse
@@ -19,7 +20,9 @@ OAUTH_URL = f"{DARAJA_BASE}/oauth/v1/generate?grant_type=client_credentials"
 STK_URL = f"{DARAJA_BASE}/mpesa/stkpush/v1/processrequest"
 
 def _now_ts() -> str:
-    return dt.datetime.now().strftime("%Y%m%d%H%M%S")  # YYYYMMDDHHMMSS
+    # Use East Africa Time to match typical operator timezone
+    eat = timezone(timedelta(hours=3))
+    return datetime.now(eat).strftime("%Y%m%d%H%M%S")
 
 def _password(ts: str) -> str:
     raw = f"{SHORTCODE}{PASSKEY}{ts}".encode()
@@ -32,19 +35,19 @@ def _token() -> str:
 
 def _normalize_msisdn(msisdn: str) -> str:
     s = str(msisdn).strip().replace(" ", "")
-    if s.startswith("+"): s = s[1:]
-    if s.startswith("07"): s = "254" + s[1:]
+    if s.startswith("+"):
+        s = s[1:]
+    if s.startswith("07") and len(s) == 10:
+        s = "254" + s[1:]
     return s
 
 def _validated_callback() -> str:
-    """Ensure callback URL is https and well-formed; trim stray spaces."""
     cb = (CALLBACK_URL or "").strip()
     if not cb:
         raise ValueError("MPESA_CALLBACK_URL is not set")
     p = urlparse(cb)
     if p.scheme.lower() != "https" or not p.netloc:
         raise ValueError(f"MPESA_CALLBACK_URL must be https and public. Got: {cb!r}")
-    # optional: enforce path ends with /mpesa/callback to match your router
     if not p.path.endswith("/mpesa/callback"):
         raise ValueError(f"MPESA_CALLBACK_URL path should end with /mpesa/callback. Got: {cb!r}")
     return cb
@@ -58,11 +61,16 @@ def stk_push(
     desc: str | None = None,
     transaction_desc: str | None = None,
 ) -> Dict[str, Any]:
-    # Accept both router shapes
+    # Accept both shapes from router
     phone_val = phone or phone_number
     if not phone_val:
         raise ValueError("Missing phone / phone_number")
     phone_val = _normalize_msisdn(phone_val)
+
+    # Daraja requires int KES
+    amount = int(amount)
+    if amount < 1:
+        raise ValueError("Amount must be >= 1 KES")
 
     acc_ref = (account_ref or account_reference or "FRUITS")[:12]
     descr  = (desc or transaction_desc or "Payment")[:13]
@@ -74,7 +82,7 @@ def stk_push(
         "Password": _password(ts),
         "Timestamp": ts,
         "TransactionType": "CustomerPayBillOnline",
-        "Amount": int(amount),
+        "Amount": amount,
         "PartyA": phone_val,
         "PartyB": SHORTCODE,
         "PhoneNumber": phone_val,
@@ -88,12 +96,9 @@ def stk_push(
         "Content-Type": "application/json",
     }
 
-    # Helpful debug
     print("STK DEBUG:", {"CallBackURL": cb_url, "Timestamp": ts})
-
     r = requests.post(STK_URL, json=payload, headers=headers, timeout=TIMEOUT)
 
-    # Log Daraja response (no secrets)
     try:
         dbg_body = r.json()
     except Exception:

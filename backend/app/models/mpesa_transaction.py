@@ -1,5 +1,5 @@
-# backend/app/models/mpesa_transaction.py
 from sqlalchemy import Column, Integer, String, Float, ForeignKey, DateTime
+from sqlalchemy.orm import relationship
 from app.database import Base
 from datetime import datetime
 
@@ -26,3 +26,7 @@ class MpesaTransaction(Base):
 
     created_at = Column(DateTime, default=datetime.utcnow)
     updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+
+    # relationships
+    vendor = relationship("Vendor", back_populates="mpesa_transactions")
+    product = relationship("Product", back_populates="mpesa_transactions")

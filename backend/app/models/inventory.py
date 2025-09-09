@@ -1,6 +1,6 @@
 from sqlalchemy import Column, Integer, Float, ForeignKey
-from app.database import Base
 from sqlalchemy.orm import relationship
+from app.database import Base
 
 class Inventory(Base):
     __tablename__ = "inventories"
@@ -11,4 +11,6 @@ class Inventory(Base):
 
     quantity = Column(Float, nullable=False)
 
-    product = relationship("Product", backref="inventory_items")
+    # relationships
+    vendor = relationship("Vendor", back_populates="inventories")
+    product = relationship("Product", back_populates="inventories")

@@ -1,3 +1,4 @@
+# backend/app/models/sale.py
 from sqlalchemy import Column, Integer, Float, ForeignKey, DateTime
 from sqlalchemy.orm import relationship
 from app.database import Base
@@ -16,4 +17,6 @@ class Sale(Base):
 
     timestamp = Column(DateTime, default=datetime.utcnow)
 
-    product = relationship("Product", backref="sales")
+    # Relationships
+    vendor = relationship("Vendor", back_populates="sales")   # <-- this was missing
+    product = relationship("Product", back_populates="sales")

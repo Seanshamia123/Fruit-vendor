@@ -17,5 +17,6 @@ class Purchase(Base):
     source = Column(String(255), nullable=True)  # optional supplier or location
     timestamp = Column(DateTime, default=datetime.utcnow)
 
-    # relationships (optional)
-    product = relationship("Product", backref="purchases")
+    # relationships
+    vendor = relationship("Vendor", back_populates="purchases")
+    product = relationship("Product", back_populates="purchases")

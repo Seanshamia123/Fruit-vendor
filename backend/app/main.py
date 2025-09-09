@@ -8,6 +8,11 @@ from app.routes.product import router as product_router
 from app.routes.purchase import router as purchase_router
 from app.routes.inventory import router as inventory_router
 from dotenv import load_dotenv
+
+# --- IMPORTANT: force import all models here ---
+from app.models import product, sale as sale_model, vendor, purchase, inventory, mpesa_transaction
+# This ensures SQLAlchemy registers all models (Product, Sale, etc.) before metadata.create_all
+
 load_dotenv()  # loads .env into process env
 
 app = FastAPI()
@@ -27,9 +32,9 @@ app.include_router(product_router)
 app.include_router(purchase_router)
 app.include_router(inventory_router)
 app.include_router(sale.router)
-app.include_router(mpesa.router)   # <-- ensures /mpesa/* is mounted
+app.include_router(mpesa.router)
 
-# DB
+# DB - run after all models are imported
 Base.metadata.create_all(bind=engine)
 
 @app.get("/")

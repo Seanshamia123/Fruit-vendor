@@ -1,77 +1,127 @@
-from fastapi import APIRouter, Depends, HTTPException, status
+# backend/app/routes/mpesa.py
+from fastapi import APIRouter, Depends, HTTPException, Request, status
 from sqlalchemy.orm import Session
-from app.models.product import Product
-from app.schemas.product import ProductCreate, ProductOut
+from typing import Any, Dict
+from app.database import SessionLocal
+from app.services import mpesa as mpesa_service
+from app.schemas.mpesa import STKPushRequest, STKPushResponse
 from app.routes.auth import get_current_vendor
-from app.dependencies.db import get_db
+from app.models.mpesa_transaction import MpesaTransaction
 
-router = APIRouter(prefix="/products", tags=["Products"])
+router = APIRouter(prefix="/mpesa", tags=["mpesa"])
 
-@router.post("/", response_model=ProductOut, status_code=status.HTTP_201_CREATED)
-def create_product(
-    product: ProductCreate,
+def get_db():
+    db = SessionLocal()
+    try:
+        yield db
+    finally:
+        db.close()
+
+@router.post("/stk-push", response_model=STKPushResponse)
+def initiate_stk_push(
+    body: STKPushRequest,
     db: Session = Depends(get_db),
-    current_vendor=Depends(get_current_vendor)
+    current_vendor = Depends(get_current_vendor)
 ):
-    new_product = Product(
+    """
+    Protected: vendor initiates STK push to customer's phone.
+    Stores initial request (merchant/checkout ids) in DB for reconciliation.
+    """
+    account_ref = body.account_reference or f"V{current_vendor.id}"
+    try:
+        resp = mpesa_service.stk_push(
+            phone_number=body.phone_number,
+            amount=body.amount,
+            account_reference=account_ref,
+            transaction_desc=body.transaction_desc,
+        )
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=str(e))
+
+    tr = MpesaTransaction(
         vendor_id=current_vendor.id,
-        name=product.name,
-        unit=product.unit,
-        variation=product.variation,
-        sale_type=product.sale_type
+        amount=body.amount,
+        phone_number=body.phone_number,
+        account_reference=account_ref,
+        response_code=resp.get("ResponseCode"),
+        response_description=resp.get("ResponseDescription"),
+        merchant_request_id=resp.get("MerchantRequestID"),
+        checkout_request_id=resp.get("CheckoutRequestID"),
     )
-    db.add(new_product)
+    db.add(tr)
     db.commit()
-    db.refresh(new_product)
-    return new_product
+    db.refresh(tr)
 
-@router.get("/", response_model=list[ProductOut])
-def get_products(
-    db: Session = Depends(get_db),
-    current_vendor=Depends(get_current_vendor)
-):
-    return db.query(Product).filter(Product.vendor_id == current_vendor.id).all()
+    return {
+        "MerchantRequestID": resp.get("MerchantRequestID"),
+        "CheckoutRequestID": resp.get("CheckoutRequestID"),
+        "ResponseCode": resp.get("ResponseCode"),
+        "ResponseDescription": resp.get("ResponseDescription"),
+    }
 
-@router.get("/{product_id}", response_model=ProductOut)
-def get_product_by_id(
-    product_id: int,
-    db: Session = Depends(get_db),
-    current_vendor=Depends(get_current_vendor)
-):
-    product = db.query(Product).filter(Product.id == product_id, Product.vendor_id == current_vendor.id).first()
-    if not product:
-        raise HTTPException(status_code=404, detail="Product not found")
-    return product
+@router.post("/callback", status_code=status.HTTP_200_OK)
+async def mpesa_callback(request: Request, db: Session = Depends(get_db)):
+    """
+    Public endpoint that Daraja posts to.
+    We reconcile mpesa_transactions using CheckoutRequestID.
+    Always return 200 (Daraja retries on non-200).
+    """
+    data: Dict[str, Any] = await request.json()
+    print("CALLBACK RAW >>>", data)
 
-@router.put("/{product_id}", response_model=ProductOut)
-def update_product(
-    product_id: int,
-    updated: ProductCreate,
-    db: Session = Depends(get_db),
-    current_vendor=Depends(get_current_vendor)
-):
-    product = db.query(Product).filter(Product.id == product_id, Product.vendor_id == current_vendor.id).first()
-    if not product:
-        raise HTTPException(status_code=404, detail="Product not found")
+    try:
+        stk = data.get("Body", {}).get("stkCallback", {})
+        merchant_request_id = stk.get("MerchantRequestID")
+        checkout_request_id = stk.get("CheckoutRequestID")
+        result_code = stk.get("ResultCode")
+        result_desc = stk.get("ResultDesc")
 
-    product.name = updated.name
-    product.unit = updated.unit
-    product.variation = updated.variation
-    product.sale_type = updated.sale_type
+        tx = None
+        if checkout_request_id:
+            tx = db.query(MpesaTransaction).filter(
+                MpesaTransaction.checkout_request_id == checkout_request_id
+            ).first()
 
-    db.commit()
-    db.refresh(product)
-    return product
+        amount = None
+        mpesa_receipt = None
+        phone = None
+        meta = stk.get("CallbackMetadata", {}).get("Item", [])
+        for item in meta:
+            name = item.get("Name")
+            value = item.get("Value")
+            if name == "Amount":
+                amount = value
+            elif name == "MpesaReceiptNumber":
+                mpesa_receipt = value
+            elif name == "PhoneNumber":
+                phone = value
 
-@router.delete("/{product_id}", status_code=status.HTTP_204_NO_CONTENT)
-def delete_product(
-    product_id: int,
-    db: Session = Depends(get_db),
-    current_vendor=Depends(get_current_vendor)
-):
-    product = db.query(Product).filter(Product.id == product_id, Product.vendor_id == current_vendor.id).first()
-    if not product:
-        raise HTTPException(status_code=404, detail="Product not found")
-    db.delete(product)
-    db.commit()
-    return
+        if tx:
+            tx.result_code = result_code
+            tx.result_desc = result_desc
+            tx.mpesa_receipt = mpesa_receipt
+            if amount is not None:
+                tx.amount = amount
+            if phone is not None:
+                tx.phone_number = str(phone)
+            db.add(tx)
+            db.commit()
+        else:
+            tx = MpesaTransaction(
+                merchant_request_id=merchant_request_id,
+                checkout_request_id=checkout_request_id,
+                result_code=result_code,
+                result_desc=result_desc,
+                mpesa_receipt=mpesa_receipt,
+                amount=amount,
+                phone_number=str(phone) if phone is not None else None,
+            )
+            db.add(tx)
+            db.commit()
+
+        # TODO (next): if result_code == 0 -> create Sale + update inventory (idempotent)
+
+        return {"ResultCode": 0, "ResultDesc": "Accepted"}
+    except Exception as e:
+        print("Error processing mpesa callback:", str(e))
+        return {"ResultCode": 1, "ResultDesc": "Failed to process callback"}
