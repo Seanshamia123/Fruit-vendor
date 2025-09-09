@@ -1,4 +1,3 @@
-# backend/app/routes/mpesa.py
 from fastapi import APIRouter, Depends, HTTPException, Request
 from sqlalchemy.orm import Session, joinedload
 from app.database import SessionLocal
@@ -12,9 +11,10 @@ from app.models.product import Product
 from app.models.vendor import Vendor
 from datetime import datetime
 from typing import List
+import os, json, logging
+from logging.handlers import RotatingFileHandler
 
 router = APIRouter(prefix="/mpesa", tags=["mpesa"])
-
 
 def get_db():
     db = SessionLocal()
@@ -23,20 +23,27 @@ def get_db():
     finally:
         db.close()
 
+# Logging setup (rotating file)
+LOG_DIR = os.getenv("LOG_DIR", "logs")
+os.makedirs(LOG_DIR, exist_ok=True)
+logfile = os.path.join(LOG_DIR, "mpesa_callbacks.log")
+logger = logging.getLogger("mpesa_callbacks")
+if not logger.handlers:
+    handler = RotatingFileHandler(logfile, maxBytes=5 * 1024 * 1024, backupCount=5)
+    formatter = logging.Formatter("%(asctime)s %(levelname)s %(message)s")
+    handler.setFormatter(formatter)
+    logger.addHandler(handler)
+    logger.setLevel(logging.INFO)
 
-# -----------------------
+
 # Initiate STK Push
-# -----------------------
 @router.post("/stk-push", response_model=STKPushResponse)
 def initiate_stk_push(
     body: STKPushRequest,
     db: Session = Depends(get_db),
     current_vendor=Depends(get_current_vendor),
 ):
-    """
-    Vendor initiates STK push to customer's phone.
-    Saves initial request in DB (with product_id).
-    """
+    # Enforce product_id at API level
     if not body.product_id:
         raise HTTPException(status_code=400, detail="Product ID is required for M-Pesa payment.")
 
@@ -50,6 +57,7 @@ def initiate_stk_push(
             transaction_desc=body.transaction_desc,
         )
     except Exception as e:
+        logger.exception("STK push failed for vendor %s, phone %s", current_vendor.id, body.phone_number)
         raise HTTPException(status_code=500, detail=str(e))
 
     tr = MpesaTransaction(
@@ -67,6 +75,8 @@ def initiate_stk_push(
     db.commit()
     db.refresh(tr)
 
+    logger.info("STK push initiated: vendor=%s product=%s checkout=%s", current_vendor.id, body.product_id, resp.get("CheckoutRequestID"))
+
     return {
         "MerchantRequestID": resp.get("MerchantRequestID"),
         "CheckoutRequestID": resp.get("CheckoutRequestID"),
@@ -75,18 +85,21 @@ def initiate_stk_push(
     }
 
 
-# -----------------------
 # Callback from Daraja
-# -----------------------
 @router.post("/callback")
 async def mpesa_callback(request: Request, db: Session = Depends(get_db)):
     """
-    Safaricom Daraja posts transaction result here.
-    Updates MpesaTransaction.
-    If payment successful (ResultCode == 0), creates a Sale + reduces inventory.
+    Public webhook endpoint that Daraja posts to.
+    We: save raw payload, update existing transaction (if found),
+    write mpesa_receipt + metadata, then create Sale + update Inventory on success.
+    Always return HTTP 200 with ack JSON (Daraja retries on non-200).
     """
     data = await request.json()
-    print("CALLBACK RAW >>>", data)
+    # log raw JSON (file)
+    try:
+        logger.info("Callback received: %s", json.dumps(data))
+    except Exception:
+        logger.info("Callback received (non-serializable payload)")
 
     try:
         stk = data.get("Body", {}).get("stkCallback", {})
@@ -103,7 +116,7 @@ async def mpesa_callback(request: Request, db: Session = Depends(get_db)):
                 .first()
             )
 
-        # Extract metadata
+        # Extract metadata items
         amount = None
         mpesa_receipt = None
         phone = None
@@ -118,8 +131,10 @@ async def mpesa_callback(request: Request, db: Session = Depends(get_db)):
             elif name == "PhoneNumber":
                 phone = value
 
-        # Update or insert transaction
+        # Update or insert transaction; always persist raw payload
+        raw_json = json.dumps(data)
         if tx:
+            tx.raw_payload = raw_json
             tx.result_code = result_code
             tx.result_desc = result_desc
             tx.mpesa_receipt = mpesa_receipt
@@ -127,6 +142,7 @@ async def mpesa_callback(request: Request, db: Session = Depends(get_db)):
             tx.phone_number = phone or tx.phone_number
             db.add(tx)
             db.commit()
+            logger.info("Updated MpesaTransaction(id=%s) checkout=%s result=%s receipt=%s", tx.id, checkout_request_id, result_code, mpesa_receipt)
         else:
             tx = MpesaTransaction(
                 merchant_request_id=merchant_request_id,
@@ -136,15 +152,14 @@ async def mpesa_callback(request: Request, db: Session = Depends(get_db)):
                 mpesa_receipt=mpesa_receipt,
                 amount=amount,
                 phone_number=phone,
+                raw_payload=raw_json,
             )
             db.add(tx)
             db.commit()
+            logger.info("Inserted orphan MpesaTransaction checkout=%s result=%s receipt=%s", checkout_request_id, result_code, mpesa_receipt)
 
-        # -------------------------------
-        # Automatic Sale + Inventory
-        # -------------------------------
+        # Automatic Sale + Inventory (idempotent)
         if result_code == 0 and tx and mpesa_receipt:
-            # Idempotency: skip if already recorded
             existing_sale = (
                 db.query(Sale)
                 .filter(Sale.reference_no == mpesa_receipt)
@@ -152,11 +167,11 @@ async def mpesa_callback(request: Request, db: Session = Depends(get_db)):
             )
             if not existing_sale:
                 if tx.vendor_id and tx.product_id:
-                    # Create Sale
+                    # create sale
                     new_sale = Sale(
                         vendor_id=tx.vendor_id,
                         product_id=tx.product_id,
-                        quantity=1,  # Default assumption: 1 unit
+                        quantity=1,
                         unit_price=tx.amount,
                         total_price=tx.amount,
                         reference_no=mpesa_receipt,
@@ -164,41 +179,36 @@ async def mpesa_callback(request: Request, db: Session = Depends(get_db)):
                     )
                     db.add(new_sale)
 
-                    # Update Inventory
                     inv = (
                         db.query(Inventory)
                         .filter(Inventory.product_id == tx.product_id)
                         .first()
                     )
                     if inv:
-                        inv.stock_out += 1
+                        # assume inventory exposes stock_out integer
+                        inv.stock_out = (inv.stock_out or 0) + 1
                         db.add(inv)
 
                     db.commit()
-                    print(f"✅ Sale + Inventory updated for receipt {mpesa_receipt}")
+                    logger.info("Created Sale(id=%s) for receipt=%s", new_sale.id, mpesa_receipt)
                 else:
-                    print("⚠️ Sale not created (missing vendor_id or product_id)")
+                    logger.warning("Callback success but missing vendor/product on tx id=%s", tx.id)
 
     except Exception as e:
-        print("❌ Error processing mpesa callback:", str(e))
+        logger.exception("Error processing mpesa callback")
+        # still respond 200 to Daraja; internal monitoring will have logs
         return {"ResultCode": 1, "ResultDesc": "Failed to process callback"}
 
-    # Daraja requires HTTP 200 with a simple ACK
+    # Daraja expects HTTP 200 + small JSON ack
     return {"ResultCode": 0, "ResultDesc": "Accepted"}
 
 
-# -----------------------
-# M-Pesa Transaction History (basic)
-# -----------------------
+# Basic history endpoint (keeps previous shape)
 @router.get("/history", response_model=List[MpesaHistoryOut])
 def get_mpesa_history(
     db: Session = Depends(get_db),
     current_vendor=Depends(get_current_vendor),
 ):
-    """
-    Show combined history of M-Pesa transactions + linked Sales
-    for the current vendor.
-    """
     transactions = (
         db.query(MpesaTransaction)
         .filter(MpesaTransaction.vendor_id == current_vendor.id)
@@ -208,7 +218,6 @@ def get_mpesa_history(
 
     history = []
     for tx in transactions:
-        # try to find matching Sale (via mpesa_receipt)
         sale = (
             db.query(Sale)
             .filter(Sale.reference_no == tx.mpesa_receipt)
@@ -235,18 +244,12 @@ def get_mpesa_history(
     return history
 
 
-# -----------------------
-# Enhanced History Endpoint
-# -----------------------
+# Enhanced history (product+vendor names)
 @router.get("/history/enhanced")
 def get_enhanced_mpesa_history(
     db: Session = Depends(get_db),
     current_vendor=Depends(get_current_vendor)
 ):
-    """
-    Return merged M-Pesa + Sale history for the logged-in vendor.
-    Includes product name + vendor name for readability.
-    """
     txs = (
         db.query(MpesaTransaction)
         .options(joinedload(MpesaTransaction.product), joinedload(MpesaTransaction.vendor))
