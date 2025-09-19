@@ -8,6 +8,8 @@ from app.routes.product import router as product_router
 from app.routes.purchase import router as purchase_router
 from app.routes.inventory import router as inventory_router
 from dotenv import load_dotenv
+from app.routes.vendor import router as vendor_router  # NEW
+
 
 # --- IMPORTANT: force import all models here ---
 from app.models import product, sale as sale_model, vendor, purchase, inventory, mpesa_transaction
@@ -33,6 +35,7 @@ app.include_router(purchase_router)
 app.include_router(inventory_router)
 app.include_router(sale.router)
 app.include_router(mpesa.router)
+app.include_router(vendor_router)   # NEW
 
 # DB - run after all models are imported
 Base.metadata.create_all(bind=engine)
