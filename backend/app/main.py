@@ -9,6 +9,7 @@ from app.routes.purchase import router as purchase_router
 from app.routes.inventory import router as inventory_router
 from dotenv import load_dotenv
 from app.routes.vendor import router as vendor_router  # NEW
+from app.routes import vendor_preference
 
 
 # --- IMPORTANT: force import all models here ---
@@ -35,7 +36,8 @@ app.include_router(purchase_router)
 app.include_router(inventory_router)
 app.include_router(sale.router)
 app.include_router(mpesa.router)
-app.include_router(vendor_router)   # NEW
+app.include_router(vendor_router)   
+app.include_router(vendor_preference.router)
 
 # DB - run after all models are imported
 Base.metadata.create_all(bind=engine)
