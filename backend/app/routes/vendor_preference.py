@@ -2,7 +2,7 @@ from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from app.dependencies import get_db
 from app.schemas.vendor_preference import VendorPreferenceCreate, VendorPreferenceUpdate, VendorPreferenceOut
-from app.services import vendor_preference_service
+from app.services import vendor_preference
 
 router = APIRouter(prefix="/vendor-preferences", tags=["Vendor Preferences"])
 
