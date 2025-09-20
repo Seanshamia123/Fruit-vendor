@@ -11,6 +11,7 @@ from dotenv import load_dotenv
 from app.routes.vendor import router as vendor_router  # NEW
 from app.routes import vendor_preference
 from app.routes import spoilage_entry as spoilage_entry_router
+from app.routes import sale as sale_router
 
 
 # --- IMPORTANT: force import all models here ---
@@ -35,11 +36,11 @@ app.include_router(auth.router)
 app.include_router(product_router)
 app.include_router(purchase_router)
 app.include_router(inventory_router)
-app.include_router(sale.router)
 app.include_router(mpesa.router)
 app.include_router(vendor_router)   
 app.include_router(vendor_preference.router)
 app.include_router(spoilage_entry_router.router)
+app.include_router(sale_router.router)
 
 
 # DB - run after all models are imported
