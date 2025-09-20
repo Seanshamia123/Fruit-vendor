@@ -1,41 +1,51 @@
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
-from app.database import SessionLocal
-from app.models.purchase import Purchase
-from app.schemas.purchase import PurchaseCreate, PurchaseOut
+from typing import List
+
+from app.schemas.purchase import PurchaseCreate, PurchaseOut, PurchaseUpdate
+from app.services import purchase as purchase_service
+from app.dependencies import get_db
 from app.routes.auth import get_current_vendor
 
 router = APIRouter(prefix="/purchases", tags=["Purchases"])
 
-def get_db():
-    db = SessionLocal()
-    try:
-        yield db
-    finally:
-        db.close()
 
 @router.post("/", response_model=PurchaseOut)
 def create_purchase(
     purchase: PurchaseCreate,
     db: Session = Depends(get_db),
-    current_vendor: dict = Depends(get_current_vendor)
+    current_vendor=Depends(get_current_vendor)
 ):
-    new_purchase = Purchase(
-        vendor_id=current_vendor.id,
-        product_id=purchase.product_id,
-        quantity=purchase.quantity,
-        unit_cost=purchase.unit_cost,
-        total_cost=purchase.total_cost,
-        source=purchase.source
-    )
-    db.add(new_purchase)
-    db.commit()
-    db.refresh(new_purchase)
-    return new_purchase
+    return purchase_service.create_purchase(db, vendor_id=current_vendor.id, purchase=purchase)
 
-@router.get("/", response_model=list[PurchaseOut])
+
+@router.get("/", response_model=List[PurchaseOut])
 def get_all_purchases(
     db: Session = Depends(get_db),
-    current_vendor: dict = Depends(get_current_vendor)
+    current_vendor=Depends(get_current_vendor)
 ):
-    return db.query(Purchase).filter(Purchase.vendor_id == current_vendor["id"]).all()
+    return purchase_service.get_purchases_by_vendor(db, vendor_id=current_vendor.id)
+
+
+@router.get("/{purchase_id}", response_model=PurchaseOut)
+def get_purchase(purchase_id: int, db: Session = Depends(get_db)):
+    db_purchase = purchase_service.get_purchase(db, purchase_id)
+    if not db_purchase:
+        raise HTTPException(status_code=404, detail="Purchase not found")
+    return db_purchase
+
+
+@router.put("/{purchase_id}", response_model=PurchaseOut)
+def update_purchase(purchase_id: int, purchase_update: PurchaseUpdate, db: Session = Depends(get_db)):
+    updated = purchase_service.update_purchase(db, purchase_id, purchase_update)
+    if not updated:
+        raise HTTPException(status_code=404, detail="Purchase not found")
+    return updated
+
+
+@router.delete("/{purchase_id}", response_model=dict)
+def delete_purchase(purchase_id: int, db: Session = Depends(get_db)):
+    deleted = purchase_service.delete_purchase(db, purchase_id)
+    if not deleted:
+        raise HTTPException(status_code=404, detail="Purchase not found")
+    return {"ok": True}
