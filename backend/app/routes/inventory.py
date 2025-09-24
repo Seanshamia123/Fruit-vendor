@@ -1,8 +1,9 @@
+# backend/app/routes/inventory.py
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from app.database import SessionLocal
-from app.models.inventory import Inventory
 from app.schemas.inventory import InventoryCreate, InventoryOut
+from app.services import inventory as inventory_service
 from app.routes.auth import get_current_vendor
 
 router = APIRouter(prefix="/inventory", tags=["Inventory"])
@@ -20,30 +21,11 @@ def add_inventory(
     db: Session = Depends(get_db),
     current_vendor = Depends(get_current_vendor)
 ):
-    existing = db.query(Inventory).filter(
-        Inventory.vendor_id == current_vendor.id,
-        Inventory.product_id == inventory.product_id
-    ).first()
-
-    if existing:
-        existing.quantity += inventory.quantity
-        db.commit()
-        db.refresh(existing)
-        return existing
-
-    new_item = Inventory(
-        vendor_id=current_vendor.id,
-        product_id=inventory.product_id,
-        quantity=inventory.quantity
-    )
-    db.add(new_item)
-    db.commit()
-    db.refresh(new_item)
-    return new_item
+    return inventory_service.add_inventory(db, current_vendor.id, inventory)
 
 @router.get("/", response_model=list[InventoryOut])
 def list_inventory(
     db: Session = Depends(get_db),
     current_vendor = Depends(get_current_vendor)
 ):
-    return db.query(Inventory).filter(Inventory.vendor_id == current_vendor.id).all()
+    return inventory_service.list_inventory(db, current_vendor.id)
