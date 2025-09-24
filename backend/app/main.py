@@ -16,6 +16,7 @@ from app.routes import product_pricing
 from app.routes import payment
 from app.routes import inventory_history
 from app.routes import cart
+from app.routes import cart_item
 
 
 # --- IMPORTANT: force import all models here ---
@@ -49,6 +50,7 @@ app.include_router(product_pricing.router)
 app.include_router(payment.router)
 app.include_router(inventory_history.router)
 app.include_router(cart.router)
+app.include_router(cart_item.router)
 
 
 # DB - run after all models are imported
