@@ -1,0 +1,30 @@
+/* TopBar.module.css - simple page top navigation */
+
+.container {
+  height: 3rem;
+  display: flex;
+  align-items: center;
+}
+
+.backButton {
+  align-items: center;
+  background: transparent;
+  border: none;
+  border-radius: 9999px;
+  cursor: pointer;
+  display: inline-flex;
+  height: 2.25rem;
+  justify-content: center;
+  transition: background 0.2s ease;
+  width: 2.25rem;
+}
+
+.backButton:hover {
+  background: #f3f4f6;
+}
+
+.backButton svg {
+  height: 20px;
+  width: 20px;
+}
+

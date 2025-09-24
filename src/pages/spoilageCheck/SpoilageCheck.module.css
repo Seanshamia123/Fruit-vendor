@@ -1,0 +1,74 @@
+/* SpoilageCheck.module.css - layout for the spoilage check page */
+
+.pageStack {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.statusCard {
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 1.75rem;
+  box-shadow: 0 18px 40px rgba(15, 23, 42, 0.12);
+  padding: 1.25rem;
+}
+
+.statusRow {
+  align-items: center;
+  display: flex;
+  justify-content: space-between;
+}
+
+.statusLabel {
+  color: #9ca3af;
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+.statusValue {
+  color: #2563eb;
+  font-size: 0.95rem;
+  font-weight: 600;
+}
+
+.legendList {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.legendItem {
+  align-items: center;
+  display: flex;
+  gap: 0.6rem;
+  color: #374151;
+}
+
+.legendDot {
+  border-radius: 9999px;
+  height: 0.6rem;
+  width: 0.6rem;
+}
+
+.dotGood {
+  background: #22c55e;
+}
+
+.dotDueSoon {
+  background: #f59e0b;
+}
+
+.dotOverdue {
+  background: #ef4444;
+}
+
+.priorityList {
+  background: #ffffff;
+  border: 1px dashed #e5e7eb;
+  border-radius: 1.5rem;
+  padding: 1.25rem;
+  color: #9ca3af;
+  text-align: center;
+}
+

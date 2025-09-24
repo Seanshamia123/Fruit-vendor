@@ -1,0 +1,49 @@
+/* Chip.module.css - pill selector used in onboarding */
+
+.chip {
+  align-items: center;
+  border-radius: 1rem;
+  border: 1px solid #d1d5db;
+  display: flex;
+  font-size: 0.95rem;
+  font-weight: 600;
+  height: 4rem;
+  justify-content: center;
+  transition: transform 0.2s ease, background-color 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+  width: 100%;
+}
+
+@media (min-width: 640px) {
+  .chip {
+    height: 5rem;
+  }
+}
+
+@media (min-width: 768px) {
+  .chip {
+    height: 6rem;
+  }
+}
+
+.chip:focus-visible {
+  outline: 2px solid rgba(245, 158, 11, 0.4);
+  outline-offset: 2px;
+}
+
+.chip:not(.chipSelected):hover {
+  border-color: #9ca3af;
+  transform: scale(1.02);
+}
+
+.chipSelected {
+  background: #fbbf24;
+  border-color: #f59e0b;
+  color: #111827;
+  box-shadow: 0 8px 16px rgba(251, 191, 36, 0.25);
+  transform: scale(1.02);
+}
+
+.chipDefault {
+  background: #ffffff;
+  color: #111827;
+}

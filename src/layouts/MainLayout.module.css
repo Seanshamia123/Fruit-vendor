@@ -1,0 +1,261 @@
+/* MainLayout.module.css - shell layout shared across dashboard pages */
+
+.layout {
+  background: #f9fafb;
+  color: #111827;
+  min-height: 100vh;
+}
+
+.shell {
+  margin: 0 auto;
+  max-width: 1120px;
+  min-height: 100vh;
+  padding: 1rem 1.5rem 3rem;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+}
+
+.header {
+  align-items: center;
+  display: flex;
+  justify-content: space-between;
+  position: relative;
+}
+
+.menuButton {
+  align-items: center;
+  background: transparent;
+  border: none;
+  border-radius: 0.75rem;
+  cursor: pointer;
+  display: flex;
+  justify-content: center;
+  padding: 0.35rem;
+  transition: background 0.2s ease;
+}
+
+.menuButton:hover {
+  background: rgba(15, 23, 42, 0.08);
+}
+
+.menuButton svg {
+  height: 28px;
+  width: 28px;
+}
+
+.titleGroup {
+  align-items: center;
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  text-align: center;
+}
+
+.title {
+  font-size: 1.125rem;
+  font-weight: 600;
+}
+
+.subtitle {
+  color: #6b7280;
+  font-size: 0.875rem;
+  margin-top: 0.25rem;
+}
+
+.avatarSlot {
+  align-items: center;
+  display: flex;
+  height: 2.75rem;
+  justify-content: flex-end;
+  min-width: 2.75rem;
+}
+
+.avatarMenuWrapper {
+  position: relative;
+}
+
+.avatarTrigger {
+  align-items: center;
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 9999px;
+  box-shadow: 0 8px 24px rgba(15, 23, 42, 0.1);
+  color: #1f2937;
+  cursor: pointer;
+  display: inline-flex;
+  gap: 0.4rem;
+  padding: 0.35rem 0.55rem 0.35rem 0.35rem;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.avatarTrigger:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 12px 28px rgba(15, 23, 42, 0.16);
+}
+
+.avatarFallback {
+  align-items: center;
+  background: #fef3c7;
+  border-radius: 9999px;
+  color: #b45309;
+  display: flex;
+  font-size: 0.875rem;
+  font-weight: 600;
+  height: 2.25rem;
+  justify-content: center;
+  width: 2.25rem;
+}
+
+.avatarChevron {
+  height: 18px;
+  width: 18px;
+}
+
+.avatarDropdown {
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 1rem;
+  box-shadow: 0 24px 48px rgba(15, 23, 42, 0.18);
+  min-width: 12rem;
+  opacity: 0;
+  pointer-events: none;
+  position: absolute;
+  right: 0;
+  top: calc(100% + 0.6rem);
+  transform: translateY(-6px) scale(0.97);
+  transition: opacity 0.2s ease, transform 0.2s ease;
+  z-index: 60;
+}
+
+.avatarDropdownOpen {
+  opacity: 1;
+  pointer-events: auto;
+  transform: translateY(0) scale(1);
+}
+
+.avatarMenuItem {
+  background: none;
+  border: none;
+  color: #1f2937;
+  cursor: pointer;
+  display: block;
+  font-size: 0.95rem;
+  padding: 0.7rem 1rem;
+  text-align: left;
+  width: 100%;
+  border-radius: 0.75rem;
+}
+
+.avatarMenuItem:hover,
+.avatarMenuItem:focus {
+  background: #f8fafc;
+  outline: none;
+}
+
+.avatarMenuItem + .avatarMenuItem {
+  margin-top: 0.25rem;
+}
+
+.mobileMenu {
+  background: #ffffff;
+  border: 1px solid #f1f5f9;
+  border-radius: 1.5rem;
+  box-shadow: 0 20px 40px rgba(15, 23, 42, 0.14);
+  left: 0;
+  margin-top: 0.75rem;
+  padding: 1rem;
+  position: absolute;
+  top: calc(100% + 0.5rem);
+  width: 16rem;
+  z-index: 30;
+}
+
+.mainContent {
+  animation: page-fade 220ms ease-out both;
+  flex: 1;
+  margin-top: 1.5rem;
+}
+
+.overlay {
+  background: rgba(15, 23, 42, 0.35);
+  border: none;
+  cursor: pointer;
+  inset: 0;
+  position: fixed;
+  z-index: 30;
+}
+
+.drawer {
+  background: #ffffff;
+  box-shadow: 0 20px 48px rgba(15, 23, 42, 0.2);
+  height: 100%;
+  left: 0;
+  max-width: 20rem;
+  padding: 2rem 1.5rem;
+  position: fixed;
+  top: 0;
+  transform: translateX(-100%);
+  transition: transform 0.3s ease;
+  width: min(20rem, 82vw);
+  z-index: 40;
+}
+
+.drawerOpen {
+  transform: translateX(0%);
+}
+
+.drawerHeader {
+  align-items: center;
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 1.5rem;
+}
+
+.drawerTitle {
+  font-size: 1.125rem;
+  font-weight: 600;
+}
+
+.drawerCloseButton {
+  align-items: center;
+  background: #f3f4f6;
+  border: 1px solid #e5e7eb;
+  border-radius: 1rem;
+  cursor: pointer;
+  display: flex;
+  height: 2.25rem;
+  justify-content: center;
+  transition: background 0.2s ease;
+  width: 2.25rem;
+}
+
+.drawerCloseButton:hover {
+  background: #e5e7eb;
+}
+
+.drawerCloseButton svg {
+  height: 18px;
+  width: 18px;
+}
+
+@keyframes page-fade {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (min-width: 1024px) {
+  .shell {
+    padding: 1.5rem 2rem 3rem;
+  }
+
+  .title {
+    font-size: 1.25rem;
+  }
+}

@@ -1,0 +1,77 @@
+/* StockTurnover.module.css - layout for the stock turnover page */
+
+.contentStack {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.sectionCard {
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 1.75rem;
+  box-shadow: 0 20px 44px rgba(15, 23, 42, 0.12);
+  padding: 1.25rem;
+}
+
+.sectionHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.sectionTitle {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #111827;
+}
+
+.sectionLink {
+  color: #2563eb;
+  font-size: 0.85rem;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.tableWrapper {
+  overflow-x: auto;
+}
+
+.table {
+  border-collapse: collapse;
+  min-width: 100%;
+  width: 100%;
+}
+
+.table thead {
+  color: #9ca3af;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.table th,
+.table td {
+  padding: 0.75rem 0.5rem;
+  text-align: left;
+}
+
+.table tbody tr {
+  border-top: 1px solid #e5e7eb;
+}
+
+.table tbody tr:first-of-type {
+  border-top: none;
+}
+
+.gradeCell {
+  font-weight: 600;
+  color: #1f2937;
+}
+
+.dateCell {
+  color: #2563eb;
+  font-weight: 600;
+}
+

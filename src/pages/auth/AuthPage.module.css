@@ -1,0 +1,98 @@
+.page {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem 1.5rem;
+  background: linear-gradient(160deg, rgba(15, 88, 192, 0.08), rgba(255, 255, 255, 0.9));
+}
+
+.panel {
+  width: min(480px, 100%);
+  background: #ffffff;
+  border-radius: 20px;
+  box-shadow: 0 20px 36px rgba(15, 63, 118, 0.12);
+  padding: clamp(2rem, 4vw, 3rem);
+  display: grid;
+  gap: 1.5rem;
+}
+
+.header {
+  display: grid;
+  gap: 0.5rem;
+}
+
+.title {
+  font-size: clamp(1.75rem, 4vw, 2.5rem);
+  font-weight: 700;
+  color: #123a62;
+}
+
+.subtitle {
+  color: #3b5e82;
+  font-size: 0.95rem;
+}
+
+.form {
+  display: grid;
+  gap: 1.25rem;
+}
+
+.field {
+  display: grid;
+  gap: 0.5rem;
+}
+
+.label {
+  font-weight: 600;
+  color: #244d73;
+}
+
+.input {
+  padding: 0.875rem 1rem;
+  border: 1px solid rgba(18, 58, 98, 0.15);
+  border-radius: 12px;
+  font-size: 1rem;
+  transition: border 0.2s ease, box-shadow 0.2s ease;
+}
+
+.input:focus {
+  outline: none;
+  border-color: #0f58c0;
+  box-shadow: 0 0 0 4px rgba(15, 88, 192, 0.15);
+}
+
+.helper {
+  font-size: 0.85rem;
+  color: #5c7fa3;
+}
+
+.error {
+  font-size: 0.85rem;
+  color: #c73642;
+}
+
+.actions {
+  display: grid;
+  gap: 0.75rem;
+}
+
+.altAction {
+  font-size: 0.9rem;
+  color: #486889;
+}
+
+.altAction button {
+  background: none;
+  border: none;
+  padding: 0;
+  font: inherit;
+  color: #0f58c0;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.altAction button:hover,
+.altAction button:focus {
+  text-decoration: underline;
+}

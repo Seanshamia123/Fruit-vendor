@@ -1,28 +1,27 @@
 import React from 'react'
+import styles from './StepperFooter.module.css'
 
 type Props = {
   step: number
   total: number
 }
 
-const Dot = ({ active }: { active: boolean }) => (
-  <span
-    className={`inline-block h-2 w-2 rounded-full ${active ? 'bg-blue-600' : 'bg-gray-300'}`}
-  />
-)
-
-const StepperFooter: React.FC<Props> = ({ step, total }) => {
-  return (
-    <div className="flex flex-col items-center gap-2 text-xs text-gray-500">
-      <div className="flex items-center gap-2">
-        {Array.from({ length: total }).map((_, idx) => (
-          <Dot key={idx} active={idx + 1 === step} />
-        ))}
-      </div>
-      <div>{`Step ${step} of ${total}`}</div>
+const StepperFooter: React.FC<Props> = ({ step, total }) => (
+  <div className={styles.footer}>
+    <div className={styles.dots}>
+      {Array.from({ length: total }).map((_, index) => (
+        <span
+          // eslint-disable-next-line react/no-array-index-key
+          key={index}
+          className={`${styles.dot} ${index + 1 === step ? styles.dotActive : ''}`}
+        />
+      ))}
     </div>
-  )
-}
+    <span>
+      Step {step} of {total}
+    </span>
+  </div>
+)
 
 export default StepperFooter
 
