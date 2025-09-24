@@ -17,6 +17,7 @@ from app.routes import payment
 from app.routes import inventory_history
 from app.routes import cart
 from app.routes import cart_item
+from app.routes import bonus_rule
 
 
 # --- IMPORTANT: force import all models here ---
@@ -51,6 +52,7 @@ app.include_router(payment.router)
 app.include_router(inventory_history.router)
 app.include_router(cart.router)
 app.include_router(cart_item.router)
+app.include_router(bonus_rule.router)
 
 
 # DB - run after all models are imported
