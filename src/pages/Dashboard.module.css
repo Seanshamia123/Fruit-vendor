@@ -1,0 +1,12 @@
+/* Dashboard.module.css - layout rules for the main dashboard page */
+
+.sectionSpacing {
+  margin-top: 1.5rem;
+}
+
+.sectionStack {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+

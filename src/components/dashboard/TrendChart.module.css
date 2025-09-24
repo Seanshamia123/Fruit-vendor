@@ -1,0 +1,88 @@
+/* TrendChart.module.css - shared line chart block for analytics pages */
+
+.card {
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 1.75rem;
+  box-shadow: 0 20px 44px rgba(15, 23, 42, 0.12);
+  padding: 1.25rem;
+}
+
+.header {
+  align-items: baseline;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.headerTitle {
+  color: #111827;
+  font-size: 1.05rem;
+  font-weight: 600;
+}
+
+.headerSubtitle {
+  color: #6b7280;
+  font-size: 0.75rem;
+}
+
+.legend {
+  align-items: center;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  font-size: 0.75rem;
+  color: #475569;
+}
+
+.legendItem {
+  align-items: center;
+  display: flex;
+  gap: 0.5rem;
+}
+
+.legendDot {
+  border-radius: 9999px;
+  height: 0.65rem;
+  width: 0.65rem;
+}
+
+.legendDotGold {
+  background: #fbbf24;
+}
+
+.legendDotBlue {
+  background: #60a5fa;
+}
+
+.legendDotGreen {
+  background: #34d399;
+}
+
+.legendDotSlate {
+  background: #94a3b8;
+}
+
+.chartArea {
+  margin-top: 1.25rem;
+  width: 100%;
+}
+
+.chartSvg {
+  display: block;
+  width: 100%;
+  height: auto;
+  max-height: 16rem;
+}
+
+@media (min-width: 640px) {
+  .header {
+    align-items: center;
+    flex-direction: row;
+    justify-content: space-between;
+  }
+
+  .headerTitle {
+    font-size: 1.125rem;
+  }
+}

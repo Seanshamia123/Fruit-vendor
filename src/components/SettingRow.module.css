@@ -1,0 +1,22 @@
+/* SettingRow.module.css - layout for labeled settings rows */
+
+.row {
+  align-items: center;
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 1.5rem;
+  display: flex;
+  gap: 1rem;
+  justify-content: space-between;
+  padding: 1rem;
+}
+
+.label {
+  color: #374151;
+  font-weight: 600;
+}
+
+.field {
+  min-width: 140px;
+}
+

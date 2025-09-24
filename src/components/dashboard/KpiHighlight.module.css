@@ -1,0 +1,40 @@
+/* KpiHighlight.module.css - hero KPI block on dashboards */
+
+.card {
+  align-items: center;
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 1.75rem;
+  box-shadow: 0 20px 48px rgba(15, 23, 42, 0.1);
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  justify-content: space-between;
+  padding: 1.25rem;
+}
+
+.title {
+  color: #6b7280;
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.label {
+  color: #111827;
+  font-size: 1rem;
+  font-weight: 600;
+  margin-top: 0.35rem;
+}
+
+.value {
+  background: #fbbf24;
+  border-radius: 9999px;
+  box-shadow: 0 12px 30px rgba(251, 191, 36, 0.3);
+  color: #000000;
+  font-size: 0.95rem;
+  font-weight: 700;
+  padding: 0.55rem 1.2rem;
+}
+

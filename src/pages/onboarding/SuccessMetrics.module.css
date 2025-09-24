@@ -1,0 +1,72 @@
+/* SuccessMetrics.module.css - onboarding KPI selection screen */
+
+.page {
+  background: #f9fafb;
+  color: #111827;
+  min-height: 100vh;
+}
+
+.shell {
+  margin: 0 auto;
+  max-width: 960px;
+  min-height: 100vh;
+  padding: 0.5rem 1.5rem 2rem;
+  display: flex;
+  flex-direction: column;
+}
+
+.main {
+  animation: page-in 220ms ease-out both;
+  flex: 1;
+}
+
+.header {
+  text-align: center;
+  margin: 1rem 0 1.5rem;
+}
+
+.title {
+  font-size: 1.125rem;
+  font-weight: 600;
+}
+
+.subtitle {
+  color: #6b7280;
+  font-size: 0.9rem;
+  margin-top: 0.5rem;
+}
+
+.grid {
+  display: grid;
+  gap: 0.75rem;
+}
+
+.gridMobile {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.gridTablet {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+.gridDesktop {
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+}
+
+.notice {
+  text-align: center;
+  font-size: 0.85rem;
+  color: #6b7280;
+  margin-bottom: 1rem;
+}
+
+.footer {
+  margin-top: auto;
+}
+
+.nextButtonWrapper {
+  display: flex;
+  justify-content: flex-end;
+  position: sticky;
+  bottom: 1rem;
+}

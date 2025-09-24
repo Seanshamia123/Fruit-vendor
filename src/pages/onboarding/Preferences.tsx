@@ -6,66 +6,78 @@ import Button from '../../components/Button'
 import Select from '../../components/Select'
 import SettingRow from '../../components/SettingRow'
 import { useOnboarding } from '../../state/onboardingContext'
+import { useAuth } from '../../state/authContext'
 import { saveOnboarding } from '../../utils/storage'
+import styles from './Preferences.module.css'
 
 const Preferences: React.FC = () => {
   const navigate = useNavigate()
   const { preferences, setPreference, selectedKpis } = useOnboarding()
+  const { markOnboardingStatus, signOut } = useAuth()
 
   const [saving, setSaving] = useState(false)
 
   const finish = () => {
     setSaving(true)
     // Persist to localStorage (offline-first)
+    const status: 'completed' = 'completed'
     saveOnboarding({
       selectedKpis,
       preferences,
-      status: 'completed',
+      status,
       updatedAt: new Date().toISOString(),
     })
+    markOnboardingStatus(status)
     // simulate API/network delay to show feedback
     setTimeout(() => {
-      navigate('/dashboard')
+      signOut()
+      navigate('/sign-in', { replace: true })
     }, 200)
   }
 
   const skip = () => {
+    const status: 'skipped' = 'skipped'
     saveOnboarding({
       selectedKpis,
       preferences,
-      status: 'skipped',
+      status,
       updatedAt: new Date().toISOString(),
     })
-    navigate('/dashboard')
+    markOnboardingStatus(status)
+    signOut()
+    navigate('/sign-in', { replace: true })
   }
 
   const editLater = () => {
+    const status: 'deferred' = 'deferred'
     saveOnboarding({
       selectedKpis,
       preferences,
-      status: 'deferred',
+      status,
       updatedAt: new Date().toISOString(),
     })
-    navigate('/dashboard')
+    markOnboardingStatus(status)
+    signOut()
+    navigate('/sign-in', { replace: true })
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 text-gray-900">
-      <div className="mx-auto px-4 pt-2 pb-8 flex flex-col min-h-screen max-w-md md:max-w-2xl lg:max-w-4xl">
+    <div className={styles.page}>
+      <div className={styles.shell}>
         <TopBar />
 
-        <main className="flex-1 animate-page">
-          <header className="text-center mt-2 mb-6">
-            <h1 className="text-lg font-semibold">How do you want to view them?</h1>
+        <main className={styles.main}>
+          <header className={styles.header}>
+            <h1 className={styles.title}>How do you want to view them?</h1>
           </header>
 
           {selectedKpis.length === 0 && (
-            <div className="mb-4 p-3 rounded-xl bg-yellow-50 text-yellow-800 border border-yellow-200" role="alert" aria-live="assertive">
+            <div className={styles.alertBox} role="alert" aria-live="assertive">
               You have not selected any metrics yet. Choose at least one metric first to tailor your preferences.
             </div>
           )}
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className={styles.grid}>
             <SettingRow label="Time frame">
               <Select
                 aria-label="Time frame"
@@ -117,14 +129,16 @@ const Preferences: React.FC = () => {
             </SettingRow>
           </div>
 
-          <div className="flex flex-wrap gap-3 justify-end mt-6 sticky bottom-4">
+          <div className={styles.actions}>
             <Button variant="ghost" onClick={skip}>Skip</Button>
             <Button variant="secondary" onClick={editLater}>Edit later</Button>
-            <Button onClick={finish} disabled={saving}>{saving ? 'Saving…' : 'Finish'}</Button>
+            <Button onClick={finish} disabled={saving || selectedKpis.length === 0}>
+              {saving ? 'Saving…' : 'Finish'}
+            </Button>
           </div>
         </main>
 
-        <footer className="mt-8">
+        <footer className={styles.footer}>
           <StepperFooter step={2} total={2} />
         </footer>
       </div>

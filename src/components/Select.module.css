@@ -1,0 +1,45 @@
+/* Select.module.css - styled dropdown used in onboarding */
+
+.wrapper {
+  display: block;
+}
+
+.label {
+  color: #6b7280;
+  font-size: 0.85rem;
+  margin-bottom: 0.4rem;
+}
+
+.selectWrapper {
+  position: relative;
+}
+
+.select {
+  appearance: none;
+  background: #fbbf24;
+  border: none;
+  border-radius: 9999px;
+  color: #111827;
+  font-weight: 600;
+  padding: 0.6rem 2.5rem 0.6rem 1rem;
+  width: 100%;
+}
+
+.select:focus-visible {
+  outline: 2px solid rgba(245, 158, 11, 0.5);
+  outline-offset: 2px;
+}
+
+.caret {
+  pointer-events: none;
+  position: absolute;
+  right: 1rem;
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+.caret svg {
+  height: 16px;
+  width: 16px;
+}
+

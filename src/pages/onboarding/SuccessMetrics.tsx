@@ -6,6 +6,7 @@ import Chip from '../../components/Chip'
 import Button from '../../components/Button'
 import { KPI_OPTIONS, useOnboarding } from '../../state/onboardingContext'
 import { useDevice } from '../../hooks/useDevice'
+import styles from './SuccessMetrics.module.css'
 
 const SuccessMetrics: React.FC = () => {
   const navigate = useNavigate()
@@ -15,51 +16,40 @@ const SuccessMetrics: React.FC = () => {
   const canContinue = selectedKpis.length > 0
 
   return (
-    <div className="min-h-screen bg-gray-50 text-gray-900">
-      <div className="mx-auto px-4 pt-2 pb-8 flex flex-col min-h-screen max-w-md md:max-w-2xl lg:max-w-4xl">
+    <div className={styles.page}>
+      <div className={styles.shell}>
         <TopBar />
 
-        <main className="flex-1 animate-page">
-          <header className="text-center mt-2 mb-6">
-            <h1 className="text-lg font-semibold">What do you view as success in your business?</h1>
-            <p className="text-sm text-gray-600 mt-1">Pick all that apply</p>
+        <main className={styles.main}>
+          <header className={styles.header}>
+            <h1 className={styles.title}>What do you view as success in your business?</h1>
+            <p className={styles.subtitle}>Pick all that apply</p>
           </header>
 
           <section
-            className={`grid gap-3 mb-6 ${
-              device === 'mobile' ? 'grid-cols-3' : device === 'tablet' ? 'grid-cols-4' : 'grid-cols-6'
+            className={`${styles.grid} ${
+              device === 'mobile' ? styles.gridMobile : device === 'tablet' ? styles.gridTablet : styles.gridDesktop
             }`}
           >
             {KPI_OPTIONS.map((kpi) => (
-              <Chip
-                key={kpi}
-                label={kpi}
-                selected={selectedKpis.includes(kpi)}
-                onClick={() => toggleKpi(kpi)}
-                className="h-16 sm:h-20 md:h-24"
-              />
+              <Chip key={kpi} label={kpi} selected={selectedKpis.includes(kpi)} onClick={() => toggleKpi(kpi)} />
             ))}
           </section>
 
           {selectedKpis.length === 0 && (
-            <p className="text-center text-sm text-gray-500 mb-4" aria-live="polite">
+            <p className={styles.notice} aria-live="polite">
               Pick at least one metric to continue.
             </p>
           )}
 
-          <div className="flex justify-end sticky bottom-4">
-            <Button
-              onClick={() => navigate('/onboarding/preferences')}
-              disabled={!canContinue}
-              aria-disabled={!canContinue}
-              className={!canContinue ? 'opacity-60 cursor-not-allowed' : ''}
-            >
+          <div className={styles.nextButtonWrapper}>
+            <Button onClick={() => navigate('/onboarding/preferences')} disabled={!canContinue} aria-disabled={!canContinue}>
               Next
             </Button>
           </div>
         </main>
 
-        <footer className="mt-8">
+        <footer className={styles.footer}>
           <StepperFooter step={1} total={2} />
         </footer>
       </div>

@@ -1,4 +1,5 @@
 import React from 'react'
+import styles from './SettingRow.module.css'
 
 type Props = {
   label: string
@@ -7,12 +8,11 @@ type Props = {
 
 const SettingRow: React.FC<Props> = ({ label, children }) => {
   return (
-    <div className="w-full border rounded-2xl bg-white p-4 flex items-center justify-between gap-4">
-      <div className="text-gray-700 font-medium">{label}</div>
-      <div className="min-w-[140px]">{children}</div>
+    <div className={styles.row}>
+      <div className={styles.label}>{label}</div>
+      <div className={styles.field}>{children}</div>
     </div>
   )
 }
 
 export default SettingRow
-
