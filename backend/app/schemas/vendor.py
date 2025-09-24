@@ -1,16 +1,30 @@
 from pydantic import BaseModel, EmailStr
+from typing import Optional
+from datetime import datetime
 
-class VendorCreate(BaseModel):
+
+class VendorBase(BaseModel):
     name: str
     email: EmailStr
     contact: str
-    password: str
+    location: Optional[str] = None
 
-class VendorOut(BaseModel):
+
+class VendorCreate(VendorBase):
+    password: str  # plaintext during creation
+
+
+class VendorUpdate(BaseModel):
+    name: Optional[str] = None
+    email: Optional[EmailStr] = None
+    contact: Optional[str] = None
+    location: Optional[str] = None
+    password: Optional[str] = None
+
+
+class VendorOut(VendorBase):
     id: int
-    name: str
-    email: EmailStr
-    contact: str
+    created_at: datetime
 
     class Config:
-        orm_mode = True
+        from_attributes = True

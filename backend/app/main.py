@@ -8,6 +8,17 @@ from app.routes.product import router as product_router
 from app.routes.purchase import router as purchase_router
 from app.routes.inventory import router as inventory_router
 from dotenv import load_dotenv
+from app.routes.vendor import router as vendor_router  # NEW
+from app.routes import vendor_preference
+from app.routes import spoilage_entry as spoilage_entry_router
+from app.routes import sale as sale_router
+from app.routes import product_pricing
+from app.routes import payment
+from app.routes import inventory_history
+from app.routes import cart
+from app.routes import cart_item
+from app.routes import bonus_rule
+
 
 # --- IMPORTANT: force import all models here ---
 from app.models import product, sale as sale_model, vendor, purchase, inventory, mpesa_transaction
@@ -31,8 +42,18 @@ app.include_router(auth.router)
 app.include_router(product_router)
 app.include_router(purchase_router)
 app.include_router(inventory_router)
-app.include_router(sale.router)
 app.include_router(mpesa.router)
+app.include_router(vendor_router)   
+app.include_router(vendor_preference.router)
+app.include_router(spoilage_entry_router.router)
+app.include_router(sale_router.router)
+app.include_router(product_pricing.router)
+app.include_router(payment.router)
+app.include_router(inventory_history.router)
+app.include_router(cart.router)
+app.include_router(cart_item.router)
+app.include_router(bonus_rule.router)
+
 
 # DB - run after all models are imported
 Base.metadata.create_all(bind=engine)
