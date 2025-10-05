@@ -1,0 +1,96 @@
+.card {
+  background: #ffffff;
+  border-radius: 1.75rem;
+  border: 1px solid #e2e8f0;
+  box-shadow: 0 26px 60px rgba(15, 23, 42, 0.08);
+  padding: 1.8rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.2rem;
+}
+
+.cardHeader {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.cardIcon {
+  width: 42px;
+  height: 42px;
+  border-radius: 999px;
+  background: #f1f5f9;
+  display: grid;
+  place-items: center;
+  color: #0f172a;
+}
+
+.cardTitle {
+  margin: 0;
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #0f172a;
+}
+
+.cardSubtitle {
+  margin: 0.2rem 0 0;
+  font-size: 0.9rem;
+  color: #64748b;
+}
+
+.optionList {
+  display: grid;
+  gap: 0.8rem;
+}
+
+.optionButton {
+  border-radius: 1.4rem;
+  border: 1px solid #e2e8f0;
+  background: #ffffff;
+  padding: 1rem 1.2rem;
+  display: flex;
+  align-items: center;
+  gap: 0.9rem;
+  cursor: pointer;
+  text-align: left;
+}
+
+.optionButtonActive {
+  background: #0f172a;
+  border-color: #0f172a;
+  color: #ffffff;
+  box-shadow: 0 20px 40px rgba(15, 23, 42, 0.28);
+}
+
+.optionButtonActive .optionDescription {
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.optionIcon {
+  width: 32px;
+  height: 32px;
+  border-radius: 999px;
+  background: rgba(15, 23, 42, 0.08);
+  display: grid;
+  place-items: center;
+}
+
+.optionButtonActive .optionIcon {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.optionIcon svg {
+  width: 18px;
+  height: 18px;
+}
+
+.optionTitle {
+  margin: 0;
+  font-weight: 700;
+}
+
+.optionDescription {
+  margin: 0.25rem 0 0;
+  font-size: 0.85rem;
+  color: #64748b;
+}

@@ -1,0 +1,140 @@
+
+.card {
+  background: #ffffff;
+  border-radius: 1.75rem;
+  border: 1px solid #e2e8f0;
+  box-shadow: 0 26px 60px rgba(15, 23, 42, 0.08);
+  padding: 1.8rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.2rem;
+}
+
+.cardHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.cardTitleGroup {
+  display: flex;
+  align-items: center;
+  gap: 0.9rem;
+}
+
+.cardIcon {
+  width: 42px;
+  height: 42px;
+  background: #f1f5f9;
+  border-radius: 999px;
+  display: grid;
+  place-items: center;
+  color: #0f172a;
+}
+
+.cardTitle {
+  margin: 0;
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #0f172a;
+}
+
+.cardSubtitle {
+  margin: 0.25rem 0 0;
+  font-size: 0.9rem;
+  color: #64748b;
+}
+
+.ghostButton {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  border-radius: 999px;
+  border: 1px solid #cbd5f5;
+  background: #ffffff;
+  color: #1d4ed8;
+  font-size: 0.85rem;
+  font-weight: 600;
+  padding: 0.45rem 1rem;
+  cursor: pointer;
+}
+
+.ghostButton svg {
+  width: 16px;
+  height: 16px;
+}
+
+.editActions {
+  display: inline-flex;
+  gap: 0.75rem;
+}
+
+.primaryButton {
+  border-radius: 999px;
+  border: none;
+  padding: 0.45rem 1.1rem;
+  background: #0f172a;
+  color: #ffffff;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.fieldGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.fieldLabel {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #64748b;
+}
+
+.fieldInput {
+  border-radius: 1.2rem;
+  background: #f8fafc;
+  padding: 0.75rem 1.1rem;
+  color: #0f172a;
+  font-weight: 600;
+}
+
+.input {
+  border-radius: 1.2rem;
+  border: 1px solid #cbd5f5;
+  background: #ffffff;
+  padding: 0.75rem 1.1rem;
+  font-size: 0.95rem;
+  color: #0f172a;
+}
+
+.selectWrapper {
+  position: relative;
+}
+
+.select {
+  width: 100%;
+  border-radius: 1.2rem;
+  border: 1px solid #cbd5f5;
+  background: #ffffff;
+  padding: 0.75rem 3rem 0.75rem 1.1rem;
+  font-size: 0.95rem;
+  color: #0f172a;
+  appearance: none;
+}
+
+.selectChevron {
+  position: absolute;
+  right: 1rem;
+  top: 50%;
+  transform: translateY(-50%);
+  pointer-events: none;
+}
+
+.selectChevron svg {
+  width: 16px;
+  height: 16px;
+}
+

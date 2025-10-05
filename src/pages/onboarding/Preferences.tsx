@@ -20,7 +20,7 @@ const Preferences: React.FC = () => {
   const finish = () => {
     setSaving(true)
     // Persist to localStorage (offline-first)
-    const status: 'completed' = 'completed'
+    const status = 'completed' as const
     saveOnboarding({
       selectedKpis,
       preferences,
@@ -36,7 +36,7 @@ const Preferences: React.FC = () => {
   }
 
   const skip = () => {
-    const status: 'skipped' = 'skipped'
+    const status = 'skipped' as const
     saveOnboarding({
       selectedKpis,
       preferences,
@@ -49,7 +49,7 @@ const Preferences: React.FC = () => {
   }
 
   const editLater = () => {
-    const status: 'deferred' = 'deferred'
+    const status = 'deferred' as const
     saveOnboarding({
       selectedKpis,
       preferences,

@@ -1,74 +1,356 @@
-/* SpoilageCheck.module.css - layout for the spoilage check page */
-
 .pageStack {
   display: flex;
   flex-direction: column;
-  gap: 1.5rem;
+  gap: 2rem;
 }
 
-.statusCard {
-  background: #ffffff;
-  border: 1px solid #e5e7eb;
-  border-radius: 1.75rem;
-  box-shadow: 0 18px 40px rgba(15, 23, 42, 0.12);
-  padding: 1.25rem;
-}
-
-.statusRow {
-  align-items: center;
+.headerRow {
   display: flex;
   justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
 }
 
-.statusLabel {
-  color: #9ca3af;
-  font-size: 0.85rem;
-  font-weight: 600;
+.completeButton {
+  background: #fb5607;
+  border: none;
+  border-radius: 999px;
+  color: #ffffff;
+  cursor: pointer;
+  font-size: 0.9rem;
+  font-weight: 700;
+  padding: 0.6rem 1.6rem;
+  box-shadow: 0 20px 40px rgba(251, 86, 7, 0.3);
 }
 
-.statusValue {
-  color: #2563eb;
-  font-size: 0.95rem;
-  font-weight: 600;
-}
-
-.legendList {
+.searchCard {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 1.75rem;
+  box-shadow: 0 22px 50px rgba(15, 23, 42, 0.08);
+  padding: 1.6rem;
   display: flex;
   flex-direction: column;
+  gap: 1.25rem;
+}
+
+.searchRow {
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.searchInputWrapper {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  flex: 1 1 260px;
+  background: #f1f5f9;
+  border-radius: 1rem;
+  padding: 0.75rem 1rem;
+}
+
+
+.searchInputWrapper span {
+  display: inline-flex;
+  width: 1.1rem;
+  height: 1.1rem;
+  color: #64748b;
+}
+
+.searchInputWrapper span svg {
+  width: 100%;
+  height: 100%;
+}
+.searchInputWrapper input {
+  border: none;
+  background: transparent;
+  outline: none;
+  flex: 1;
+  font-size: 0.95rem;
+  color: #0f172a;
+}
+
+.filterButton {
+  border: 1px solid #cbd5f5;
+  background: #ffffff;
+  border-radius: 1rem;
+  padding: 0.75rem;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.filterButton svg {
+  width: 1.1rem;
+  height: 1.1rem;
+}
+
+
+.segmentGroup {
+  display: flex;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.segmentButton {
+  border: none;
+  background: #f8fafc;
+  border-radius: 999px;
+  padding: 0.45rem 0.9rem;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #475569;
+  cursor: pointer;
+}
+
+.segmentButtonActive {
+  background: #2563eb;
+  color: #ffffff;
+  box-shadow: 0 12px 32px rgba(37, 99, 235, 0.25);
+}
+
+.summaryGrid {
+  display: grid;
+  gap: 1rem;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+}
+
+.summaryCard {
+  border-radius: 1.4rem;
+  padding: 1.1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  font-weight: 600;
+  font-size: 0.9rem;
+}
+
+.summaryCount {
+  font-size: 1.4rem;
+  font-weight: 800;
+}
+
+.summaryCritical {
+  background: #fee2e2;
+  color: #b91c1c;
+}
+
+.summaryHigh {
+  background: #fef3c7;
+  color: #b45309;
+}
+
+.summaryMedium {
+  background: #fef9c3;
+  color: #92400e;
+}
+
+.summaryLow {
+  background: #dcfce7;
+  color: #047857;
+}
+
+.attentionCard {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 1.75rem;
+  box-shadow: 0 22px 48px rgba(15, 23, 42, 0.08);
+  padding: 1.75rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.4rem;
+}
+
+.attentionHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  flex-wrap: wrap;
   gap: 0.75rem;
 }
 
-.legendItem {
+.attentionTitle {
+  margin: 0;
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: #0f172a;
+}
+
+.attentionSubtitle {
+  margin: 0;
+  font-size: 0.9rem;
+  color: #64748b;
+}
+
+.attentionList {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.attentionItem {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 1rem;
   align-items: center;
+  background: #f9fafb;
+  border-radius: 1.2rem;
+  padding: 1rem 1.2rem;
+}
+
+.itemInfo {
+  display: flex;
+  align-items: center;
+  gap: 0.9rem;
+}
+
+.itemIcon {
+  flex: 0 0 auto;
+  width: 2.4rem;
+  height: 2.4rem;
+  border-radius: 1rem;
+  display: grid;
+  place-items: center;
+  font-size: 1rem;
+  background: #fee2e2;
+  color: #b91c1c;
+}
+
+.itemContent {
+  display: flex;
+  flex-direction: column;
+}
+
+.itemName {
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 700;
+  color: #0f172a;
+}
+
+.itemMeta {
+  margin: 0.25rem 0 0;
+  color: #64748b;
+  font-size: 0.85rem;
+}
+
+.itemActions {
   display: flex;
   gap: 0.6rem;
-  color: #374151;
 }
 
-.legendDot {
-  border-radius: 9999px;
-  height: 0.6rem;
-  width: 0.6rem;
-}
-
-.dotGood {
-  background: #22c55e;
-}
-
-.dotDueSoon {
-  background: #f59e0b;
-}
-
-.dotOverdue {
-  background: #ef4444;
-}
-
-.priorityList {
+.secondaryButton {
+  border-radius: 999px;
+  padding: 0.45rem 1.2rem;
+  border: 1px solid #cbd5f5;
   background: #ffffff;
-  border: 1px dashed #e5e7eb;
-  border-radius: 1.5rem;
-  padding: 1.25rem;
-  color: #9ca3af;
-  text-align: center;
+  color: #1d4ed8;
+  font-size: 0.85rem;
+  font-weight: 700;
+  cursor: pointer;
 }
 
+.dangerButton {
+  border-radius: 999px;
+  padding: 0.45rem 1.2rem;
+  border: none;
+  background: #ef4444;
+  color: #ffffff;
+  font-size: 0.85rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.itemPill {
+  border-radius: 999px;
+  padding: 0.35rem 0.75rem;
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.pillCritical {
+  background: #fee2e2;
+  color: #b91c1c;
+}
+
+.pillHigh {
+  background: #fef3c7;
+  color: #b45309;
+}
+
+.pillMedium {
+  background: #fef9c3;
+  color: #92400e;
+}
+
+.pillLow {
+  background: #dcfce7;
+  color: #047857;
+}
+
+.recommendationsCard {
+  background: #f5f8ff;
+  border: 1px solid #bfdbfe;
+  border-radius: 1.75rem;
+  box-shadow: 0 18px 42px rgba(59, 130, 246, 0.15);
+  padding: 1.75rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.recommendationsTitle {
+  margin: 0;
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #1d4ed8;
+}
+
+.recommendationsList {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  color: #1f2937;
+  font-size: 0.95rem;
+}
+
+.recommendationsList li {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+}
+
+.recommendationIcon {
+  width: 1.4rem;
+  height: 1.4rem;
+  border-radius: 999px;
+  background: rgba(59, 130, 246, 0.16);
+  color: #2563eb;
+  display: grid;
+  place-items: center;
+}
+
+@media (max-width: 640px) {
+  .attentionItem {
+    grid-template-columns: 1fr;
+    align-items: flex-start;
+  }
+
+  .itemActions {
+    justify-content: flex-start;
+  }
+}
+
+.itemIcon svg {
+  width: 1.1rem;
+  height: 1.1rem;
+}

@@ -1,0 +1,62 @@
+.card {
+  background: #f5f9ff;
+  border: 1px solid #bfdbfe;
+  border-radius: 1.75rem;
+  box-shadow: 0 22px 48px rgba(59, 130, 246, 0.16);
+  padding: 1.75rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.2rem;
+}
+
+.title {
+  margin: 0;
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #1d4ed8;
+}
+
+.list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.9rem;
+}
+
+.listItem {
+  display: flex;
+  gap: 0.75rem;
+}
+
+.dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 999px;
+  margin-top: 0.3rem;
+}
+
+.dotInfo {
+  background: #2563eb;
+}
+
+.dotSuccess {
+  background: #10b981;
+}
+
+.dotAlert {
+  background: #f97316;
+}
+
+.insightTitle {
+  margin: 0;
+  font-weight: 700;
+  color: #0f172a;
+}
+
+.insightDetail {
+  margin: 0.2rem 0 0;
+  color: #475569;
+  font-size: 0.9rem;
+}

@@ -20,23 +20,27 @@ const features = [
 
 const LandingPage = () => {
   const navigate = useNavigate()
-  const { isAuthenticated, onboardingStatus } = useAuth()
+  const { isAuthenticated, onboardingStatus, signIn, signUp, markOnboardingStatus } = useAuth()
 
   const goToPrimaryAction = () => {
-    if (isAuthenticated) {
-      const destination = onboardingStatus === 'pending' ? '/onboarding/metrics' : '/dashboard'
-      navigate(destination)
-    } else {
-      navigate('/sign-in')
+    if (!isAuthenticated) {
+      const status = signIn()
+      if (status !== 'completed') {
+        markOnboardingStatus('completed')
+      }
     }
+
+    navigate('/dashboard')
   }
 
   const goToSecondaryAction = () => {
-    if (isAuthenticated) {
-      navigate('/onboarding/metrics')
-    } else {
-      navigate('/sign-up')
+    if (!isAuthenticated) {
+      signUp()
+    } else if (onboardingStatus !== 'pending') {
+      markOnboardingStatus('pending')
     }
+
+    navigate('/onboarding')
   }
 
   return (
@@ -57,7 +61,7 @@ const LandingPage = () => {
           </div>
           {!isAuthenticated && (
             <p className={styles.secondaryAction}>
-              New here? <button type="button" onClick={() => navigate('/sign-up')}>Get started in minutes</button>
+              New here? <button type="button" onClick={goToSecondaryAction}>Get started in minutes</button>
             </p>
           )}
         </section>

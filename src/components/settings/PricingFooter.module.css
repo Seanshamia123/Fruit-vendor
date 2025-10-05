@@ -1,0 +1,49 @@
+.banner {
+  margin-top: 1.5rem;
+  background: #ecfdf5;
+  border: 1px solid #34d399;
+  border-radius: 1.5rem;
+  padding: 1.4rem 1.8rem;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 1rem;
+  align-items: center;
+}
+
+.bannerTitle {
+  margin: 0;
+  font-weight: 700;
+  color: #065f46;
+}
+
+.bannerText {
+  margin: 0.3rem 0 0;
+  color: #0f172a;
+  font-size: 0.85rem;
+}
+
+.bannerActions {
+  display: inline-flex;
+  gap: 0.75rem;
+}
+
+.cancelButton,
+.saveButton {
+  border-radius: 999px;
+  padding: 0.55rem 1.4rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.cancelButton {
+  border: 1px solid #0f172a;
+  background: transparent;
+  color: #0f172a;
+}
+
+.saveButton {
+  border: none;
+  background: #16a34a;
+  color: #ffffff;
+}

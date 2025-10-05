@@ -1,0 +1,285 @@
+.pageShell {
+  display: flex;
+  flex-direction: column;
+  gap: 1.75rem;
+  padding-bottom: 2rem;
+}
+
+.tabRow {
+  display: flex;
+  justify-content: flex-start;
+}
+
+.metricsGrid {
+  display: grid;
+  gap: 1rem;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+}
+
+.metricCard {
+  background: #ffffff;
+  border-radius: 1.25rem;
+  box-shadow: 0 18px 40px rgba(15, 23, 42, 0.08);
+  padding: 1.25rem 1.4rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.metricValue {
+  font-size: 1.8rem;
+  font-weight: 600;
+  color: #0f172a;
+}
+
+.metricLabel {
+  font-size: 0.95rem;
+  font-weight: 500;
+  color: #1f2937;
+}
+
+.metricDescription {
+  font-size: 0.85rem;
+  color: #6b7280;
+}
+
+.cardsSection {
+  display: grid;
+  gap: 1.25rem;
+}
+
+.priceListCard {
+  background: #ffffff;
+  border-radius: 1.5rem;
+  box-shadow: 0 32px 60px rgba(15, 23, 42, 0.08);
+  padding: 1.6rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.2rem;
+}
+
+.emptyState {
+  border: 1px dashed #c7d2fe;
+  border-radius: 1.25rem;
+  padding: 2rem 1.5rem;
+  display: grid;
+  gap: 0.6rem;
+  justify-items: start;
+  background: rgba(239, 246, 255, 0.5);
+}
+
+.emptyTitle {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #1e293b;
+}
+
+.emptySubtitle {
+  font-size: 0.9rem;
+  color: #475569;
+  max-width: 28rem;
+}
+
+.emptyActions {
+  display: flex;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.sectionHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.countBadge {
+  background: rgba(59, 130, 246, 0.12);
+  color: #1d4ed8;
+  font-size: 0.8rem;
+  font-weight: 600;
+  border-radius: 999px;
+  padding: 0.35rem 0.9rem;
+  white-space: nowrap;
+}
+
+.sectionTitle {
+  font-size: 1.15rem;
+  font-weight: 600;
+  color: #111827;
+}
+
+.sectionSubtitle {
+  font-size: 0.9rem;
+  color: #6b7280;
+}
+
+.productList {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.productCard {
+  border: 1px solid #e5e7eb;
+  border-radius: 1.25rem;
+  padding: 1.2rem;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: 1rem;
+  background: linear-gradient(135deg, rgba(239, 246, 255, 0.44), rgba(255, 255, 255, 0.9));
+}
+
+.productMain {
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+}
+
+.productTitle {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  font-size: 1.05rem;
+  font-weight: 600;
+  color: #0f172a;
+}
+
+.productVariety {
+  background: rgba(59, 130, 246, 0.08);
+  color: #2563eb;
+  font-size: 0.75rem;
+  font-weight: 600;
+  border-radius: 999px;
+  padding: 0.2rem 0.6rem;
+}
+
+.productTags {
+  display: flex;
+  gap: 0.35rem;
+  flex-wrap: wrap;
+}
+
+.productTag {
+  background: #eef2ff;
+  color: #4f46e5;
+  font-size: 0.75rem;
+  border-radius: 999px;
+  padding: 0.25rem 0.55rem;
+  font-weight: 500;
+}
+
+.priceDetails {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  gap: 0.6rem;
+}
+
+.priceLabel {
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  color: #6b7280;
+  letter-spacing: 0.04em;
+}
+
+.priceValue {
+  font-size: 1.05rem;
+  font-weight: 600;
+  color: #0f172a;
+}
+
+.priceAccent {
+  color: #16a34a;
+}
+
+.lastUpdated {
+  font-size: 0.8rem;
+  color: #6b7280;
+}
+
+.actionsColumn {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 0.8rem;
+}
+
+.actionButtons {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.iconButton {
+  align-items: center;
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 0.85rem;
+  color: #475569;
+  display: inline-flex;
+  height: 2.1rem;
+  justify-content: center;
+  padding: 0;
+  width: 2.1rem;
+  transition: all 0.2s ease;
+}
+
+.iconButton:hover {
+  border-color: #cbd5f5;
+  color: #2563eb;
+  transform: translateY(-1px);
+}
+
+.iconButton svg {
+  width: 18px;
+  height: 18px;
+}
+
+.tipsCard {
+  background: #ecfdf3;
+  border-radius: 1.5rem;
+  border: 1px solid rgba(34, 197, 94, 0.2);
+  padding: 1.4rem 1.6rem;
+  display: grid;
+  gap: 0.85rem;
+}
+
+.tipHeader {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  color: #15803d;
+  font-weight: 600;
+}
+
+.tipList {
+  display: grid;
+  gap: 0.6rem;
+}
+
+.tipItemTitle {
+  font-weight: 600;
+  color: #14532d;
+  font-size: 0.95rem;
+}
+
+.tipItemDescription {
+  font-size: 0.85rem;
+  color: #166534;
+}
+
+@media (max-width: 720px) {
+  .productCard {
+    grid-template-columns: 1fr;
+  }
+
+  .actionsColumn {
+    flex-direction: row;
+    align-items: center;
+  }
+
+  .iconButton {
+    width: 2.8rem;
+    height: 2.8rem;
+  }
+}

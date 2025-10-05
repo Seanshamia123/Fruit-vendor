@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react'
-import { OnboardingContext, type PreferencesState, type OnboardingCtx, type KpiKey } from './onboardingContext'
+import { OnboardingContext, type KpiKey, type OnboardingCtx, type PreferencesState } from './onboardingContext'
 import { loadOnboarding } from '../utils/storage'
 
 const createDefaultPreferences = (): PreferencesState => ({
@@ -20,11 +20,11 @@ export const OnboardingProvider = ({ children }: { children: React.ReactNode }) 
   })
 
   const toggleKpi = (kpi: KpiKey) => {
-    setSelectedKpis(prev => (prev.includes(kpi) ? prev.filter(k => k !== kpi) : [...prev, kpi]))
+    setSelectedKpis((prev) => (prev.includes(kpi) ? prev.filter((item) => item !== kpi) : [...prev, kpi]))
   }
 
   const setPreference: OnboardingCtx['setPreference'] = (key, value) => {
-    setPreferences(prev => ({ ...prev, [key]: value }))
+    setPreferences((prev) => ({ ...prev, [key]: value }))
   }
 
   const reset = () => {
@@ -32,7 +32,10 @@ export const OnboardingProvider = ({ children }: { children: React.ReactNode }) 
     setPreferences(createDefaultPreferences())
   }
 
-  const value = useMemo<OnboardingCtx>(() => ({ selectedKpis, preferences, toggleKpi, setPreference, reset }), [selectedKpis, preferences])
+  const value = useMemo<OnboardingCtx>(
+    () => ({ selectedKpis, preferences, toggleKpi, setPreference, reset }),
+    [selectedKpis, preferences]
+  )
 
   return <OnboardingContext.Provider value={value}>{children}</OnboardingContext.Provider>
 }

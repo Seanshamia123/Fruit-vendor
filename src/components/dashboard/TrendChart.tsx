@@ -131,7 +131,7 @@ const TrendChart = ({
             const y = padding + ((height - padding * 2) / horizontalLines) * (index + 1)
             return (
               <line
-                // eslint-disable-next-line react/no-array-index-key
+                
                 key={`h-${index}`}
                 x1={padding}
                 y1={y}
@@ -187,7 +187,7 @@ const TrendChart = ({
             const y = padding + (usableHeight / horizontalLines) * index
             return (
               <text
-                // eslint-disable-next-line react/no-array-index-key
+                
                 key={`y-label-${index}`}
                 x={padding - 8}
                 y={y + 4}

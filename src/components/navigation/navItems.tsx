@@ -31,49 +31,51 @@ export const NAV_ITEMS: NavItem[] = [
     ),
   },
   {
-    label: 'Stock Turnover',
-    to: '/stock-turnover',
+    label: 'Analytics',
+    to: '/analytics',
     ready: true,
     icon: (
       <svg {...iconProps}>
-        <polyline points="3 17 9 11 13 15 21 7" />
-        <polyline points="14 7 21 7 21 14" />
+        <path d="M4 19.5h16" />
+        <path d="M8 16.5v-5.5" />
+        <path d="M12 16.5v-9.5" />
+        <path d="M16 16.5v-3.5" />
+        <path d="M20 7.5 16 11 13 9 9 12" />
       </svg>
     ),
   },
   {
-    label: 'Daily Sales',
-    to: '/daily-sales',
+    label: 'Sales',
+    to: '/sales',
     ready: true,
     icon: (
       <svg {...iconProps}>
-        <path d="M4 19.5V4.5a1 1 0 0 1 1-1h14a1 1 0 0 1 1 1v15" />
-        <path d="M4 9.5h16" />
-        <path d="m6.5 16 2.5-2 2.5 2 3.5-3" />
+        <path d="M4 7h2l2 10h10l2-8H7" />
+        <circle cx="9" cy="19" r="1.5" />
+        <circle cx="17" cy="19" r="1.5" />
       </svg>
     ),
   },
   {
-    label: 'Sales Summary',
-    to: '/sales-summary',
+    label: 'Inventory',
+    to: '/inventory',
     ready: true,
     icon: (
       <svg {...iconProps}>
-        <rect x="3" y="4" width="18" height="16" rx="2" />
-        <path d="M8 10h8" />
-        <path d="M8 14h5" />
+        <path d="M3 9.5 12 4l9 5.5V20a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V9.5z" />
+        <path d="M9 22V12h6v10" />
       </svg>
     ),
   },
   {
-    label: 'Inventory Alert',
-    to: '/inventory-alert',
+    label: 'Price Management',
+    to: '/price-management',
     ready: true,
     icon: (
       <svg {...iconProps}>
-        <path d="M12 2 2 7l10 5 10-5-10-5z" />
-        <path d="M2 17l10 5 10-5" />
-        <path d="M2 12l10 5 10-5" />
+        <path d="m7 7 3-3 7 7-7 7-3-3" />
+        <path d="M2 12h3" />
+        <path d="M12 2v3" />
       </svg>
     ),
   },

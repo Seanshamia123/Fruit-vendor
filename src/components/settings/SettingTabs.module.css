@@ -1,0 +1,24 @@
+.tabStrip {
+  display: inline-flex;
+  padding: 0.35rem;
+  border-radius: 1.5rem;
+  background: #f1f5f9;
+  gap: 0.35rem;
+}
+
+.tabChip {
+  border: none;
+  border-radius: 1.2rem;
+  padding: 0.5rem 1.2rem;
+  background: transparent;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #64748b;
+  cursor: pointer;
+}
+
+.tabChipActive {
+  background: #0f172a;
+  color: #ffffff;
+  box-shadow: 0 10px 24px rgba(15, 23, 42, 0.25);
+}

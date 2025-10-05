@@ -1,57 +1,104 @@
-import type { MetricCardProps } from '../../components/dashboard/MetricCard'
-import type { ChartSeries } from '../../components/dashboard/TrendChart'
-import type { Category } from '../../components/dashboard/CategoryAccordion'
+export type MetricTone = 'green' | 'blue' | 'purple'
 
-export const metricCards: MetricCardProps[] = [
+export type DashboardMetric = {
+  id: string
+  label: string
+  value: string
+  helper?: string
+  tone: MetricTone
+}
+
+export type SpoilageTone = 'critical' | 'warning'
+
+export type SpoilageItem = {
+  id: string
+  name: string
+  quantity: string
+  timeLeft: string
+  tone: SpoilageTone
+}
+
+export type SpoilageSummary = {
+  lastCheck: string
+  items: SpoilageItem[]
+}
+
+export type QuickAction = {
+  id: string
+  label: string
+  href: string
+  tone: 'blue' | 'green' | 'purple'
+  icon: 'plus' | 'cart' | 'cube'
+}
+
+export type TopSellingItem = {
+  id: string
+  name: string
+  unitsSold: number
+  revenue: string
+  progress: number
+}
+
+export type ActivityItem = {
+  id: string
+  description: string
+  timeAgo: string
+  tone: 'success' | 'info' | 'alert'
+}
+
+export const metrics: DashboardMetric[] = [
   {
-    label: 'Total balance',
-    value: 'KSH 20,000',
-    badge: 'Settled',
-    tone: 'default',
+    id: 'todays-sales',
+    label: "Today's Sales",
+    value: 'KSh 0',
+    helper: 'No transactions yet',
+    tone: 'green',
   },
   {
-    label: 'Income today',
-    value: 'KSH 5,000',
-    badge: 'Up 12%',
-    tone: 'positive',
+    id: 'items-sold',
+    label: 'Items Sold',
+    value: '0',
+    helper: 'Awaiting first sale',
+    tone: 'blue',
   },
   {
-    label: 'Expense today',
-    value: 'KSH 7,000',
-    badge: 'Includes supplies',
-    tone: 'alert',
-  },
-  {
-    label: 'Total profit',
-    value: 'KSH 15,000',
-    badge: 'Week to date',
-    tone: 'positive',
+    id: 'stock-level',
+    label: 'Stock Level',
+    value: '--',
+    helper: 'Add products to track',
+    tone: 'purple',
   },
 ]
 
-export const trendSeries: ChartSeries[] = [
+export const spoilageSummary: SpoilageSummary = {
+  lastCheck: 'No checks logged',
+  items: [],
+}
+
+export const quickActions: QuickAction[] = [
   {
-    name: 'Income',
-    variant: 'gold',
-    values: [12000, 18000, 23000, 23000, 20000, 22000, 26000],
+    id: 'purchase',
+    label: 'New Purchase',
+    href: '#',
+    tone: 'blue',
+    icon: 'plus',
   },
   {
-    name: 'Expense',
-    variant: 'blue',
-    values: [9000, 8500, 12000, 11000, 10000, 9500, 13000],
+    id: 'sale',
+    label: 'Make Sale',
+    href: '/sales',
+    tone: 'green',
+    icon: 'cart',
+  },
+  {
+    id: 'inventory',
+    label: 'Inventory',
+    href: '#',
+    tone: 'purple',
+    icon: 'cube',
   },
 ]
 
-export const trendLabels = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
+export const topSellingItems: TopSellingItem[] = []
 
-export const incomeCategories: Category[] = [
-  { label: 'Bananas', value: 'KSH 6,000' },
-  { label: 'Mangoes', value: 'KSH 4,500' },
-  { label: 'Oranges', value: 'KSH 3,800' },
-]
-
-export const expenseCategories: Category[] = [
-  { label: 'Farmer payments', value: 'KSH 3,200' },
-  { label: 'Transport & logistics', value: 'KSH 2,100' },
-  { label: 'Market fees', value: 'KSH 1,700' },
-]
+export const recentActivity: ActivityItem[] = []

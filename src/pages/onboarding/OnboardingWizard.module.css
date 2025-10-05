@@ -1,0 +1,313 @@
+.page {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+  padding: 2rem 1.5rem 3rem;
+  background: #f5f7fb;
+}
+
+.pageHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 1.5rem;
+  flex-wrap: wrap;
+}
+
+.stepMetadata {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  align-items: flex-start;
+}
+
+.stepLabel {
+  margin: 0;
+  font-weight: 600;
+  color: #475569;
+}
+
+.progressBar {
+  width: 240px;
+  height: 6px;
+  border-radius: 999px;
+  background: #e2e8f0;
+  overflow: hidden;
+}
+
+.progressFill {
+  height: 100%;
+  border-radius: inherit;
+  background: #0f172a;
+  transition: width 0.25s ease;
+}
+
+.progressValue {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  justify-content: center;
+  gap: 0.15rem;
+  font-weight: 600;
+  color: #475569;
+  line-height: 1;
+}
+
+.progressNumber {
+  font-size: 1.4rem;
+  color: #0f172a;
+}
+
+.progressUnit {
+  font-size: 0.75rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.main {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+}
+
+.card {
+  width: min(520px, 100%);
+  background: #ffffff;
+  border-radius: 1.8rem;
+  padding: 2.2rem 2rem;
+  border: 1px solid #e2e8f0;
+  box-shadow: 0 32px 60px rgba(15, 23, 42, 0.08);
+  display: flex;
+  flex-direction: column;
+  gap: 1.4rem;
+}
+
+.summaryCard {
+  width: min(520px, 100%);
+  background: #ffffff;
+  border-radius: 1.8rem;
+  padding: 2.6rem 2.4rem;
+  border: 1px solid #e2e8f0;
+  box-shadow: 0 32px 70px rgba(15, 23, 42, 0.1);
+  display: flex;
+  flex-direction: column;
+  gap: 1.2rem;
+  align-items: center;
+  text-align: center;
+}
+
+.stepIcon {
+  width: 80px;
+  height: 80px;
+  border-radius: 999px;
+  background: #eef2ff;
+  display: grid;
+  place-items: center;
+  align-self: center;
+}
+
+.summaryIcon {
+  width: 96px;
+  height: 96px;
+  border-radius: 999px;
+  background: #dcfce7;
+  display: grid;
+  place-items: center;
+}
+
+.cardTitle {
+  margin: 0;
+  font-size: 1.3rem;
+  font-weight: 700;
+  color: #0f172a;
+  text-align: center;
+}
+
+.cardSubtitle {
+  margin: 0;
+  font-size: 0.95rem;
+  color: #64748b;
+  text-align: center;
+}
+
+.fieldGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.fieldLabel {
+  font-weight: 600;
+  color: #475569;
+}
+
+.fieldHint {
+  font-size: 0.8rem;
+  color: #94a3b8;
+}
+
+.input {
+  border-radius: 1.2rem;
+  border: 1px solid #cbd5f5;
+  padding: 0.75rem 1rem;
+  font-size: 0.95rem;
+  color: #0f172a;
+}
+
+.buttonGrid {
+  display: grid;
+  gap: 0.8rem;
+}
+
+.buttonColumn {
+  display: grid;
+  gap: 0.8rem;
+}
+
+.optionButton,
+.displayOption {
+  border-radius: 1.3rem;
+  border: 1px solid #e2e8f0;
+  background: #f8fafc;
+  padding: 0.9rem 1.1rem;
+  font-weight: 600;
+  color: #0f172a;
+  text-align: left;
+  cursor: pointer;
+}
+
+.optionButtonActive,
+.displayOptionActive {
+  background: #0f172a;
+  color: #ffffff;
+  border-color: #0f172a;
+  box-shadow: 0 20px 42px rgba(15, 23, 42, 0.25);
+}
+
+.displayOption {
+  display: flex;
+  gap: 0.9rem;
+  align-items: center;
+}
+
+.displayIcon {
+  width: 32px;
+  height: 32px;
+  border-radius: 999px;
+  background: rgba(15, 23, 42, 0.08);
+  display: grid;
+  place-items: center;
+}
+
+.displayOptionActive .displayIcon {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.optionTitle {
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 700;
+}
+
+.optionDescription {
+  margin: 0.2rem 0 0;
+  font-size: 0.85rem;
+  color: inherit;
+  opacity: 0.8;
+}
+
+.selectionSummary {
+  border-radius: 1.4rem;
+  background: #e0f2fe;
+  padding: 1rem 1.2rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.8rem;
+}
+
+.selectionLabel {
+  font-weight: 700;
+  color: #1d4ed8;
+}
+
+.selectionTags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+}
+
+.selectionTag {
+  border-radius: 999px;
+  background: #0f172a;
+  color: #ffffff;
+  padding: 0.35rem 0.8rem;
+  font-size: 0.8rem;
+}
+
+.summaryTitle {
+  margin: 0;
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: #0f172a;
+}
+
+.summarySubtitle {
+  margin: 0;
+  color: #475569;
+}
+
+.summaryHighlights {
+  width: 100%;
+  background: #e0f2fe;
+  border-radius: 1.4rem;
+  padding: 1.2rem 1.4rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.8rem;
+  text-align: left;
+}
+
+.summaryHeading {
+  margin: 0;
+  font-weight: 600;
+  color: #1d4ed8;
+}
+
+.summaryValue {
+  margin: 0.2rem 0 0;
+  color: #0f172a;
+}
+
+.footer {
+  display: flex;
+  justify-content: center;
+}
+
+.footerActions {
+  width: min(520px, 100%);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+}
+
+.actionGroup {
+  display: inline-flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.skipLink {
+  border: none;
+  background: transparent;
+  color: #64748b;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+@media (min-width: 720px) {
+  .buttonGrid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}

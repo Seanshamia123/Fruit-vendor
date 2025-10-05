@@ -1,16 +1,18 @@
 import { Routes, Route, Navigate, useLocation } from 'react-router-dom'
 import Dashboard from './pages/Dashboard'
-import SuccessMetrics from './pages/onboarding/SuccessMetrics'
-import Preferences from './pages/onboarding/Preferences'
-import StockTurnover from './pages/stockTurnover/StockTurnover'
-import DailySales from './pages/dailySales/DailySales'
-import SalesSummary from './pages/salesSummary/SalesSummary'
-import InventoryAlert from './pages/inventoryAlert/InventoryAlert'
+import SalesPage from './pages/Sales'
+import OnboardingWizard from './pages/onboarding/OnboardingWizard'
+import AnalyticsPage from './pages/analytics/AnalyticsPage'
 import SpoilageCheck from './pages/spoilageCheck/SpoilageCheck'
+import InventoryPage from './pages/inventory/InventoryPage'
 import LandingPage from './pages/landing/LandingPage'
-import SignIn from './pages/auth/SignIn'
-import SignUp from './pages/auth/SignUp'
 import Settings from './pages/Settings'
+import {
+  PriceManagementOverview,
+  PricingStrategies,
+  RewardRuleEditorPage,
+  RewardRulesPage,
+} from './pages/priceManagement'
 import { OnboardingProvider } from './state/onboarding'
 import { AuthProvider } from './state/auth'
 import { useAuth } from './state/authContext'
@@ -25,7 +27,7 @@ const RequireAuth = ({ children }: GuardProps) => {
   const location = useLocation()
 
   if (!isAuthenticated) {
-    return <Navigate to="/sign-in" replace state={{ from: location.pathname }} />
+    return <Navigate to="/" replace state={{ from: location.pathname }} />
   }
 
   return children
@@ -35,7 +37,7 @@ const RequireOnboardingComplete = ({ children }: GuardProps) => {
   const { onboardingStatus } = useAuth()
 
   if (onboardingStatus === 'pending') {
-    return <Navigate to="/onboarding/metrics" replace />
+    return <Navigate to="/onboarding" replace />
   }
 
   return children
@@ -52,22 +54,12 @@ const App = () => {
     <RouteShell>
       <Routes>
         <Route path="/" element={<LandingPage />} />
-        <Route path="/sign-in" element={<SignIn />} />
-        <Route path="/sign-up" element={<SignUp />} />
 
         <Route
-          path="/onboarding/metrics"
+          path="/onboarding"
           element={
             <RequireAuth>
-              <SuccessMetrics />
-            </RequireAuth>
-          }
-        />
-        <Route
-          path="/onboarding/preferences"
-          element={
-            <RequireAuth>
-              <Preferences />
+              <OnboardingWizard />
             </RequireAuth>
           }
         />
@@ -83,41 +75,31 @@ const App = () => {
           }
         />
         <Route
-          path="/stock-turnover"
+          path="/sales"
           element={
             <RequireAuth>
               <RequireOnboardingComplete>
-                <StockTurnover />
+                <SalesPage />
               </RequireOnboardingComplete>
             </RequireAuth>
           }
         />
         <Route
-          path="/daily-sales"
+          path="/inventory"
           element={
             <RequireAuth>
               <RequireOnboardingComplete>
-                <DailySales />
+                <InventoryPage />
               </RequireOnboardingComplete>
             </RequireAuth>
           }
         />
         <Route
-          path="/sales-summary"
+          path="/analytics"
           element={
             <RequireAuth>
               <RequireOnboardingComplete>
-                <SalesSummary />
-              </RequireOnboardingComplete>
-            </RequireAuth>
-          }
-        />
-        <Route
-          path="/inventory-alert"
-          element={
-            <RequireAuth>
-              <RequireOnboardingComplete>
-                <InventoryAlert />
+                <AnalyticsPage />
               </RequireOnboardingComplete>
             </RequireAuth>
           }
@@ -128,6 +110,46 @@ const App = () => {
             <RequireAuth>
               <RequireOnboardingComplete>
                 <SpoilageCheck />
+              </RequireOnboardingComplete>
+            </RequireAuth>
+          }
+        />
+        <Route
+          path="/price-management"
+          element={
+            <RequireAuth>
+              <RequireOnboardingComplete>
+                <PriceManagementOverview />
+              </RequireOnboardingComplete>
+            </RequireAuth>
+          }
+        />
+        <Route
+          path="/price-management/strategies"
+          element={
+            <RequireAuth>
+              <RequireOnboardingComplete>
+                <PricingStrategies />
+              </RequireOnboardingComplete>
+            </RequireAuth>
+          }
+        />
+        <Route
+          path="/price-management/rewards"
+          element={
+            <RequireAuth>
+              <RequireOnboardingComplete>
+                <RewardRulesPage />
+              </RequireOnboardingComplete>
+            </RequireAuth>
+          }
+        />
+        <Route
+          path="/price-management/rewards/edit"
+          element={
+            <RequireAuth>
+              <RequireOnboardingComplete>
+                <RewardRuleEditorPage />
               </RequireOnboardingComplete>
             </RequireAuth>
           }

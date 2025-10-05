@@ -1,0 +1,865 @@
+.page {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.viewHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.tabs {
+  display: inline-flex;
+  align-items: center;
+  background: #f3f4f6;
+  border-radius: 9999px;
+  padding: 0.3rem;
+  gap: 0.25rem;
+}
+
+.tabButton {
+  border: none;
+  background: transparent;
+  border-radius: 9999px;
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: #6b7280;
+  padding: 0.5rem 1.1rem;
+  cursor: pointer;
+  transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+.tabActive {
+  background: #111827;
+  color: #ffffff;
+}
+
+.inventoryGrid {
+  display: grid;
+  gap: 1rem;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+}
+
+.itemCard {
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 1.5rem;
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  position: relative;
+  box-shadow: 0 14px 32px rgba(15, 23, 42, 0.08);
+}
+
+.itemHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.itemName {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #111827;
+}
+
+.itemStock {
+  background: #f3f4f6;
+  border-radius: 999px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #111827;
+  padding: 0.25rem 0.6rem;
+}
+
+.itemPrice {
+  font-size: 0.95rem;
+  font-weight: 500;
+  color: #4b5563;
+}
+
+.itemAction {
+  margin-top: auto;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #2563eb;
+}
+
+.itemActionButton {
+  border: none;
+  background: transparent;
+  color: inherit;
+  padding: 0;
+  text-align: left;
+}
+
+.outOfStockBadge {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  background: #fee2e2;
+  color: #b91c1c;
+  font-size: 0.7rem;
+  font-weight: 700;
+  border-radius: 999px;
+  padding: 0.2rem 0.6rem;
+}
+
+.outOfStockLabel {
+  font-size: 0.85rem;
+  color: #9ca3af;
+  font-weight: 500;
+}
+
+.cartCard {
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 1.75rem;
+  padding: 1.25rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  box-shadow: 0 20px 44px rgba(15, 23, 42, 0.12);
+}
+
+.cartHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-weight: 600;
+  color: #111827;
+}
+
+.cartEmpty {
+  font-size: 0.95rem;
+  color: #6b7280;
+  text-align: center;
+}
+
+.emptyState {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.9rem;
+  padding: 3rem 1.5rem;
+  text-align: center;
+  border: 1px dashed #d1d5db;
+  border-radius: 1.75rem;
+  background: #f9fafb;
+  color: #64748b;
+}
+
+.emptyStateIcon {
+  width: 64px;
+  height: 64px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: #94a3b8;
+}
+
+.emptyStateIcon svg {
+  width: 48px;
+  height: 48px;
+}
+
+.emptyStateTitle {
+  margin: 0;
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: #0f172a;
+}
+
+.emptyStateSubtitle {
+  margin: 0;
+  font-size: 0.95rem;
+  max-width: 32rem;
+}
+
+.cartItems {
+  display: flex;
+  flex-direction: column;
+  gap: 0.8rem;
+}
+
+.cartRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 1rem;
+  padding-bottom: 0.75rem;
+  border-bottom: 1px solid #f3f4f6;
+}
+
+.cartItems .cartRow:last-child {
+  border-bottom: none;
+  padding-bottom: 0;
+}
+
+.cartRowMain {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+}
+
+.cartRowActions {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 0.4rem;
+}
+
+.cartRemoveButton {
+  border: none;
+  background: transparent;
+  color: #ef4444;
+  font-weight: 600;
+  cursor: pointer;
+  padding: 0;
+}
+
+.cartItemName {
+  font-weight: 600;
+  color: #111827;
+}
+
+.cartItemMeta {
+  color: #6b7280;
+  font-size: 0.85rem;
+}
+
+.cartEditor {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 0.6rem;
+  margin-top: 0.6rem;
+}
+
+.cartInputGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.cartInputLabel {
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: #6b7280;
+  font-weight: 600;
+}
+
+.cartInput {
+  border: 1px solid #d1d5db;
+  border-radius: 0.75rem;
+  padding: 0.55rem 0.7rem;
+  font-size: 0.9rem;
+  color: #111827;
+  background: #ffffff;
+}
+
+.cartInput:focus {
+  outline: 2px solid rgba(37, 99, 235, 0.3);
+  outline-offset: 1px;
+}
+
+.cartStockNote {
+  grid-column: 1 / -1;
+  font-size: 0.8rem;
+  color: #6b7280;
+}
+
+.cartAmount {
+  font-weight: 700;
+  color: #111827;
+}
+
+.cartTotal {
+  display: flex;
+  justify-content: space-between;
+  font-weight: 700;
+  font-size: 1.05rem;
+  color: #111827;
+}
+
+.cartActions {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.cartButton {
+  background: #111827;
+  color: #ffffff;
+  border-radius: 0.9rem;
+  padding: 0.9rem;
+  font-weight: 600;
+  border: none;
+  cursor: pointer;
+}
+
+.cartButton:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.manualConfigCard {
+  border: 1px dashed #d1d5db;
+  border-radius: 1.2rem;
+  padding: 0.75rem 0.9rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+  background: #f9fafb;
+}
+
+.manualFields {
+  display: flex;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.manualField {
+  flex: 1 1 120px;
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.manualLabel {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: #4b5563;
+}
+
+.manualInput {
+  border: 1px solid #d1d5db;
+  border-radius: 0.75rem;
+  padding: 0.55rem 0.7rem;
+  font-size: 0.9rem;
+}
+
+.manualAddButton {
+  align-self: flex-start;
+  border-radius: 0.8rem;
+  background: #2563eb;
+  color: #ffffff;
+  border: none;
+  font-weight: 600;
+  padding: 0.55rem 1rem;
+  cursor: pointer;
+}
+
+.multiLayout {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.sessionTabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.sessionTab {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 0.9rem;
+  border-radius: 999px;
+  background: #f3f4f6;
+  color: #374151;
+  font-weight: 600;
+  cursor: pointer;
+  border: 1px solid transparent;
+}
+
+.sessionTabActive {
+  background: #111827;
+  color: #ffffff;
+}
+
+.sessionCloseButton {
+  border: none;
+  background: transparent;
+  color: inherit;
+  padding: 0;
+  cursor: pointer;
+}
+
+.newSessionButton {
+  border: 1px dashed #d1d5db;
+  background: #ffffff;
+  border-radius: 999px;
+  padding: 0.5rem 1rem;
+  font-weight: 600;
+  color: #2563eb;
+  cursor: pointer;
+}
+
+.customerCard {
+  background: #f9fafb;
+  border-radius: 1.5rem;
+  border: 1px solid #e5e7eb;
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.customerHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.customerLabel {
+  font-weight: 600;
+  color: #111827;
+}
+
+.customerMeta {
+  color: #6b7280;
+  font-size: 0.85rem;
+}
+
+.customerTotal {
+  font-weight: 700;
+  font-size: 1.2rem;
+  color: #2563eb;
+}
+
+.sessionGrid {
+  display: grid;
+  gap: 1rem;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+}
+
+.quantityControl {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.quantityButton {
+  width: 2rem;
+  height: 2rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 999px;
+  border: none;
+  background: #111827;
+  color: #ffffff;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.quantityValue {
+  min-width: 4.5rem;
+  text-align: center;
+  font-weight: 600;
+}
+
+.customerDetailsCard {
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 1.5rem;
+  padding: 1.25rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  box-shadow: 0 16px 36px rgba(15, 23, 42, 0.1);
+}
+
+.activeSessionsCard {
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 1.5rem;
+  padding: 1.25rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  box-shadow: 0 16px 36px rgba(15, 23, 42, 0.1);
+}
+
+.sessionListItem {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.75rem 0.9rem;
+  border-radius: 1rem;
+  background: #f9fafb;
+  border: 1px solid transparent;
+  font-weight: 600;
+  color: #111827;
+}
+
+.sessionListItemActive {
+  border-color: #2563eb;
+  background: #eef2ff;
+}
+
+.paymentView {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.paymentCard {
+  background: #ffffff;
+  border-radius: 1.5rem;
+  border: 1px solid #e5e7eb;
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+  box-shadow: 0 24px 48px rgba(148, 163, 184, 0.16);
+}
+
+.paymentTitle {
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: #111827;
+}
+
+.paymentSubtitle {
+  color: #6b7280;
+  font-size: 0.95rem;
+}
+
+.orderTable {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.orderRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-weight: 600;
+  color: #111827;
+}
+
+.orderMeta {
+  color: #6b7280;
+  font-size: 0.85rem;
+}
+
+.orderTotal {
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: #047857;
+}
+
+.paymentMethods {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.methodButton {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.85rem 1rem;
+  border-radius: 1rem;
+  border: 1px solid #d1d5db;
+  background: #f9fafb;
+  font-weight: 600;
+  color: #111827;
+  cursor: pointer;
+}
+
+.methodButtonActive {
+  border-color: #2563eb;
+  background: #eef2ff;
+}
+
+.stackedButtons {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.mpesaForm {
+  border: 1px dashed #2563eb;
+  border-radius: 1.2rem;
+  padding: 0.95rem 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  background: #f8fbff;
+}
+
+.mpesaLabel {
+  font-weight: 600;
+  color: #111827;
+  font-size: 0.9rem;
+}
+
+.mpesaInput {
+  border: 1px solid #93c5fd;
+  border-radius: 0.85rem;
+  padding: 0.6rem 0.85rem;
+  font-size: 0.95rem;
+  font-weight: 500;
+  color: #1f2937;
+}
+
+.mpesaInput:focus {
+  outline: 2px solid rgba(37, 99, 235, 0.35);
+  outline-offset: 2px;
+}
+
+.mpesaHelper {
+  color: #4b5563;
+  font-size: 0.85rem;
+}
+
+.mpesaError {
+  color: #dc2626;
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+.mpesaActions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  align-items: center;
+}
+
+.mpesaSendButton {
+  border-radius: 0.85rem;
+  background: #2563eb;
+  color: #ffffff;
+  border: none;
+  font-weight: 600;
+  padding: 0.6rem 1.2rem;
+  cursor: pointer;
+}
+
+.mpesaSendButton:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.processingStatus {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.statusList {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.statusItem {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.9rem;
+}
+
+.statusBadge {
+  width: 0.75rem;
+  height: 0.75rem;
+  border-radius: 50%;
+  background: #d1d5db;
+}
+
+.statusBadgeActive {
+  background: #2563eb;
+}
+
+.statusBadgeDone {
+  background: #10b981;
+}
+
+.successHighlight {
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+.successAmount {
+  font-size: 2.2rem;
+  font-weight: 800;
+  color: #16a34a;
+}
+
+.successCaption {
+  color: #4b5563;
+  font-size: 0.95rem;
+}
+
+.stockUpdates {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.stockRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-weight: 600;
+  background: #f9fafb;
+  border-radius: 1rem;
+  padding: 0.65rem 0.9rem;
+}
+
+.stockLevelGood {
+  color: #047857;
+  font-weight: 600;
+}
+
+.failureCard {
+  background: #fef2f2;
+  border: 1px solid #fecaca;
+  border-radius: 1.5rem;
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.failureAmount {
+  font-size: 1.8rem;
+  font-weight: 800;
+  color: #dc2626;
+}
+
+.helperPanel {
+  background: #f3f4f6;
+  border-radius: 1rem;
+  padding: 1rem;
+  font-size: 0.9rem;
+  color: #374151;
+}
+
+.helperList {
+  margin: 0;
+  padding-left: 1rem;
+}
+
+.helperList li {
+  margin-bottom: 0.4rem;
+}
+
+.inlineActions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+}
+
+.inlineActionButton {
+  border-radius: 0.85rem;
+  background: #111827;
+  color: #ffffff;
+  border: none;
+  font-weight: 600;
+  padding: 0.55rem 1rem;
+  cursor: pointer;
+}
+
+.inlineActionAlt {
+  background: #f9fafb;
+  color: #111827;
+  border: 1px solid #d1d5db;
+}
+
+.sectionTitle {
+  font-weight: 700;
+  color: #111827;
+  font-size: 1.05rem;
+}
+
+.sectionSubtitle {
+  color: #6b7280;
+  font-size: 0.9rem;
+}
+
+.metaMuted {
+  color: #9ca3af;
+  font-size: 0.85rem;
+}
+
+.centeredActions {
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.badgeSuccess {
+  background: #dcfce7;
+  color: #047857;
+  border-radius: 999px;
+  padding: 0.35rem 0.8rem;
+  font-weight: 600;
+  font-size: 0.8rem;
+}
+
+.badgeWarning {
+  background: #fef3c7;
+  color: #b45309;
+  border-radius: 999px;
+  padding: 0.35rem 0.8rem;
+  font-weight: 600;
+  font-size: 0.8rem;
+}
+
+@media (max-width: 768px) {
+  .tabs {
+    width: 100%;
+    justify-content: space-between;
+  }
+
+  .tabButton {
+    flex: 1;
+    text-align: center;
+  }
+
+  .customerHeader {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.4rem;
+  }
+
+  .cartRow {
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+
+  .cartRowActions {
+    width: 100%;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .cartCard,
+  .paymentCard,
+  .customerDetailsCard,
+  .activeSessionsCard {
+    border-radius: 1.2rem;
+  }
+
+  .inventoryGrid,
+  .sessionGrid {
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  }
+}

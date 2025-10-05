@@ -1,0 +1,49 @@
+.card {
+  border-radius: 1.4rem;
+  padding: 1.4rem;
+  background: #ffffff;
+  box-shadow: 0 20px 40px rgba(15, 23, 42, 0.08);
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.label {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: #475569;
+  margin: 0;
+}
+
+.value {
+  font-size: 1.6rem;
+  font-weight: 800;
+  margin: 0;
+}
+
+.helper {
+  margin: 0;
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+.metricGreen .value,
+.metricGreen .helper {
+  color: #047857;
+}
+
+.metricBlue .value,
+.metricBlue .helper {
+  color: #1d4ed8;
+}
+
+.metricPurple .value,
+.metricPurple .helper {
+  color: #7c3aed;
+}

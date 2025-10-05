@@ -11,7 +11,7 @@ const StepperFooter: React.FC<Props> = ({ step, total }) => (
     <div className={styles.dots}>
       {Array.from({ length: total }).map((_, index) => (
         <span
-          // eslint-disable-next-line react/no-array-index-key
+          
           key={index}
           className={`${styles.dot} ${index + 1 === step ? styles.dotActive : ''}`}
         />

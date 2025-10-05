@@ -1,12 +1,26 @@
-/* Dashboard.module.css - layout rules for the main dashboard page */
+.metricGrid {
+  display: grid;
+  gap: 1.5rem;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+}
 
 .sectionSpacing {
-  margin-top: 1.5rem;
+  margin-top: 2rem;
 }
 
-.sectionStack {
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
+.quickActions {
+  display: grid;
+  gap: 1.2rem;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
 }
 
+.bottomGrid {
+  display: grid;
+  gap: 1.5rem;
+}
+
+@media (min-width: 900px) {
+  .bottomGrid {
+    grid-template-columns: 1fr 1fr;
+  }
+}
