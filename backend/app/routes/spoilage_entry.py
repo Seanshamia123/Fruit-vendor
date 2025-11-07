@@ -5,6 +5,7 @@ from typing import List
 from app.schemas.spoilage_entry import SpoilageEntryCreate, SpoilageEntryOut, SpoilageEntryUpdate
 from app.services import spoilage_entry as spoilage_service
 from app.dependencies import get_db
+from app.routes.auth import get_current_vendor
 
 router = APIRouter(
     prefix="/spoilage-entries",
@@ -13,8 +14,12 @@ router = APIRouter(
 
 
 @router.post("/", response_model=SpoilageEntryOut)
-def create_entry(entry: SpoilageEntryCreate, db: Session = Depends(get_db)):
-    return spoilage_service.create_spoilage_entry(db, entry)
+def create_entry(
+    entry: SpoilageEntryCreate,
+    db: Session = Depends(get_db),
+    current_vendor = Depends(get_current_vendor)
+):
+    return spoilage_service.create_spoilage_entry(db, current_vendor.id, entry)
 
 
 @router.get("/{entry_id}", response_model=SpoilageEntryOut)
@@ -26,8 +31,13 @@ def get_entry(entry_id: int, db: Session = Depends(get_db)):
 
 
 @router.get("/", response_model=List[SpoilageEntryOut])
-def list_entries(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
-    return spoilage_service.get_all_spoilage_entries(db, skip, limit)
+def list_entries(
+    skip: int = 0,
+    limit: int = 100,
+    db: Session = Depends(get_db),
+    current_vendor = Depends(get_current_vendor)
+):
+    return spoilage_service.get_all_spoilage_entries(db, current_vendor.id, skip, limit)
 
 
 @router.put("/{entry_id}", response_model=SpoilageEntryOut)

@@ -78,3 +78,8 @@ def login_vendor(form_data: OAuth2PasswordRequestForm = Depends(), db: Session =
         expires_delta=access_token_expires
     )
     return {"access_token": access_token, "token_type": "bearer"}
+
+@router.get("/me", response_model=VendorOut)
+def get_current_vendor_info(current_vendor: Vendor = Depends(get_current_vendor)):
+    """Get the currently authenticated vendor's information"""
+    return current_vendor

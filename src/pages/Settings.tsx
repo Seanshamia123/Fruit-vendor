@@ -1,5 +1,5 @@
 
-import { useMemo, useRef, useState } from 'react'
+import { useMemo, useRef, useState, useEffect } from 'react'
 import MainLayout from '../layouts/MainLayout'
 import SettingTabs, { type TabKey } from '../components/settings/SettingTabs'
 import ProfilePanel, { type ProfileFormData } from '../components/settings/ProfilePanel'
@@ -8,6 +8,7 @@ import AlertsPanel, { type AlertSettingKey, type PricingSettingKey } from '../co
 import QuickPromoPanel from '../components/settings/QuickPromoPanel'
 import LoyaltyRulesPanel from '../components/settings/LoyaltyRulesPanel'
 import PricingFooter from '../components/settings/PricingFooter'
+import { useSettings } from '../hooks/useSettings'
 import styles from './Settings.module.css'
 
 const PRODUCT_OPTIONS = ['Tomatoes', 'Onions', 'Milk', 'Bananas', 'Carrots', 'Spinach', 'Potatoes', 'Apples']
@@ -194,7 +195,7 @@ const COPY: Record<LanguageCode, SettingsCopy> = {
     },
     footer: {
       title: 'You have unsaved changes',
-      description: 'Press “Save” to apply your updates',
+      description: 'Press "Save" to apply your updates',
       cancel: 'Cancel',
       save: 'Save',
     },
@@ -202,16 +203,18 @@ const COPY: Record<LanguageCode, SettingsCopy> = {
 }
 
 const Settings = () => {
+  const {vendor, preferences, isLoading, error, updateVendor, updatePreferences} = useSettings()
+
   const [activeTab, setActiveTab] = useState<TabKey>('profile')
   const [profile, setProfile] = useState<ProfileFormData>({
-    name: 'Mama Grace',
-    phone: '+254712345678',
-    businessType: 'Sokoni - mboga na matunda',
-    language: 'sw',
+    name: '',
+    phone: '',
+    businessType: '',
+    language: 'en',
   })
   const [profileEditing, setProfileEditing] = useState(false)
   const [displayMode, setDisplayMode] = useState<DisplayOptionKey>('charts')
-  const [selectedQuickProducts, setSelectedQuickProducts] = useState<string[]>(['Tomatoes', 'Onions', 'Milk'])
+  const [selectedQuickProducts, setSelectedQuickProducts] = useState<string[]>([])
   const [alertSettings, setAlertSettings] = useState<Record<AlertSettingKey, boolean>>({
     stock: true,
     summary: true,
@@ -224,6 +227,37 @@ const Settings = () => {
     autoSuggest: false,
   })
   const [loyaltyEnabled, setLoyaltyEnabled] = useState(true)
+
+  // Sync vendor and preferences data from API to local state
+  useEffect(() => {
+    if (vendor) {
+      setProfile({
+        name: vendor.name,
+        phone: vendor.contact,
+        businessType: vendor.location || '',
+        language: (preferences?.language as LanguageCode) || 'en',
+      })
+    }
+  }, [vendor, preferences])
+
+  useEffect(() => {
+    if (preferences) {
+      setDisplayMode((preferences.display_mode as DisplayOptionKey) || 'charts')
+      setSelectedQuickProducts(preferences.quick_sale_products || [])
+      setAlertSettings({
+        stock: preferences.alert_low_stock ?? true,
+        summary: preferences.alert_daily_summary ?? true,
+        rewards: preferences.alert_rewards ?? false,
+        spoilage: preferences.alert_spoilage ?? true,
+      })
+      setPricingMargin(preferences.pricing_margin ?? 25)
+      setPricingSettings({
+        quickPricing: preferences.pricing_quick_pricing ?? true,
+        autoSuggest: preferences.pricing_auto_suggest ?? false,
+      })
+      setLoyaltyEnabled(preferences.loyalty_enabled ?? true)
+    }
+  }, [preferences])
 
   const initialSnapshot = useRef(
     JSON.stringify({
@@ -272,16 +306,44 @@ const Settings = () => {
     setPricingSettings((prev) => ({ ...prev, [key]: !prev[key] }))
   }
 
-  const handleSaveSnapshot = () => {
-    initialSnapshot.current = JSON.stringify({
-      profile,
-      displayMode,
-      selectedQuickProducts,
-      alertSettings,
-      pricingMargin,
-      pricingSettings,
-      loyaltyEnabled,
-    })
+  const handleSaveSnapshot = async () => {
+    try {
+      // Save vendor profile
+      await updateVendor({
+        name: profile.name,
+        contact: profile.phone,
+        location: profile.businessType,
+      })
+
+      // Save preferences
+      await updatePreferences({
+        display_mode: displayMode,
+        language: profile.language,
+        alert_low_stock: alertSettings.stock,
+        alert_daily_summary: alertSettings.summary,
+        alert_rewards: alertSettings.rewards,
+        alert_spoilage: alertSettings.spoilage,
+        pricing_margin: pricingMargin,
+        pricing_quick_pricing: pricingSettings.quickPricing,
+        pricing_auto_suggest: pricingSettings.autoSuggest,
+        quick_sale_products: selectedQuickProducts,
+        loyalty_enabled: loyaltyEnabled,
+      })
+
+      // Update initial snapshot after successful save
+      initialSnapshot.current = JSON.stringify({
+        profile,
+        displayMode,
+        selectedQuickProducts,
+        alertSettings,
+        pricingMargin,
+        pricingSettings,
+        loyaltyEnabled,
+      })
+    } catch (err) {
+      console.error('Failed to save settings:', err)
+      alert('Failed to save settings. Please try again.')
+    }
   }
 
   const handleCancelSnapshot = () => {
@@ -300,9 +362,30 @@ const Settings = () => {
     setProfile((prev) => ({ ...prev, [field]: value }))
   }
 
-  const handleProfileSave = () => {
-    handleSaveSnapshot()
-    setProfileEditing(false)
+  const handleProfileSave = async () => {
+    try {
+      await updateVendor({
+        name: profile.name,
+        contact: profile.phone,
+        location: profile.businessType,
+      })
+      await updatePreferences({
+        language: profile.language,
+      })
+      initialSnapshot.current = JSON.stringify({
+        profile,
+        displayMode,
+        selectedQuickProducts,
+        alertSettings,
+        pricingMargin,
+        pricingSettings,
+        loyaltyEnabled,
+      })
+      setProfileEditing(false)
+    } catch (err) {
+      console.error('Failed to save profile:', err)
+      alert('Failed to save profile. Please try again.')
+    }
   }
 
   const handleProfileCancel = () => {
@@ -316,6 +399,26 @@ const Settings = () => {
   }
 
   const subtitle = currentCopy.subtitles[activeTab]
+
+  if (isLoading) {
+    return (
+      <MainLayout title="Settings" subtitle="Loading...">
+        <div className={styles.wrapper}>
+          <p>Loading settings...</p>
+        </div>
+      </MainLayout>
+    )
+  }
+
+  if (error) {
+    return (
+      <MainLayout title="Settings" subtitle="Error">
+        <div className={styles.wrapper}>
+          <p style={{color: 'red'}}>Error: {error}</p>
+        </div>
+      </MainLayout>
+    )
+  }
 
   return (
     <MainLayout title={currentCopy.headerTitle} subtitle={subtitle}>

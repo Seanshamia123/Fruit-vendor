@@ -12,7 +12,7 @@ const InventoryAlerts = () => {
     (acc, plan) => {
       if (plan.status === 'Good') acc.healthy += 1
       else if (plan.status === 'Low') acc.low += 1
-      else if (plan.status === 'Out' || plan.status === 'Critical' || plan.status === 'Spoiled') acc.critical += 1
+      else if (plan.status === 'Out' || plan.status === 'Spoiled') acc.critical += 1
       if (!plan.enabled) acc.muted += 1
       return acc
     },

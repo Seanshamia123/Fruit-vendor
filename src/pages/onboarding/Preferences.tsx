@@ -8,6 +8,7 @@ import SettingRow from '../../components/SettingRow'
 import { useOnboarding } from '../../state/onboardingContext'
 import { useAuth } from '../../state/authContext'
 import { saveOnboarding } from '../../utils/storage'
+import { preferenceApi } from '../../services/api'
 import styles from './Preferences.module.css'
 
 const Preferences: React.FC = () => {
@@ -17,7 +18,30 @@ const Preferences: React.FC = () => {
 
   const [saving, setSaving] = useState(false)
 
-  const finish = () => {
+  const savePreferencesToBackend = async () => {
+    try {
+      // Map onboarding preferences to backend schema
+      const displayModeMap: Record<string, string> = {
+        'Chart': 'charts',
+        'Table': 'table',
+        'Cards': 'text',
+      }
+
+      await preferenceApi.update({
+        display_mode: displayModeMap[preferences.displayType] || 'charts',
+        dashboard_metrics: {
+          selectedKpis,
+          timeframe: preferences.timeframe,
+          granularity: preferences.granularity,
+        },
+      })
+    } catch (err) {
+      console.error('Failed to save preferences to backend:', err)
+      // Continue anyway - preferences are saved locally
+    }
+  }
+
+  const finish = async () => {
     setSaving(true)
     // Persist to localStorage (offline-first)
     const status = 'completed' as const
@@ -28,6 +52,10 @@ const Preferences: React.FC = () => {
       updatedAt: new Date().toISOString(),
     })
     markOnboardingStatus(status)
+
+    // Save to backend
+    await savePreferencesToBackend()
+
     // simulate API/network delay to show feedback
     setTimeout(() => {
       signOut()

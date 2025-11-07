@@ -4,9 +4,9 @@ from typing import Optional
 
 
 class SpoilageEntryBase(BaseModel):
-    inventory_id: int
-    quantity_spoiled: float
-    converted_to: Optional[str] = None  # discount / giveaway
+    product_id: int
+    quantity: float
+    reason: Optional[str] = None
 
 
 class SpoilageEntryCreate(SpoilageEntryBase):
@@ -14,8 +14,8 @@ class SpoilageEntryCreate(SpoilageEntryBase):
 
 
 class SpoilageEntryUpdate(BaseModel):
-    quantity_spoiled: Optional[float] = None
-    converted_to: Optional[str] = None
+    quantity: Optional[float] = None
+    reason: Optional[str] = None
 
 
 class SpoilageEntryOut(SpoilageEntryBase):
@@ -23,4 +23,4 @@ class SpoilageEntryOut(SpoilageEntryBase):
     timestamp: datetime
 
     class Config:
-        orm_mode = True
+        from_attributes = True

@@ -64,6 +64,7 @@ const MainLayout = ({ title, subtitle, trailing, children }: MainLayoutProps) =>
   const handleSignOut = () => {
     setAvatarMenuOpen(false)
     signOut()
+    navigate('/')
   }
 
   return (

@@ -6,15 +6,33 @@ import TopSellingList from '../components/dashboard/TopSellingList'
 import ActivityFeed from '../components/dashboard/ActivityFeed'
 import EmptyStateCard from '../components/emptyState/EmptyStateCard'
 import styles from './Dashboard.module.css'
-import {
-  metrics,
-  quickActions,
-  recentActivity,
-  spoilageSummary,
-  topSellingItems,
-} from './dashboard/data'
+import { quickActions } from './dashboard/data'
+import { useDashboardData } from '../hooks/useDashboardData'
 
 const Dashboard = () => {
+  const { isLoading, error, metrics, spoilageSummary, topSellingItems, recentActivity } = useDashboardData()
+
+  if (error) {
+    return (
+      <MainLayout title="Dashboard" subtitle="Welcome back!">
+        <div style={{ padding: '2rem', textAlign: 'center' }}>
+          <h2 style={{ color: '#c00', marginBottom: '1rem' }}>Error loading dashboard</h2>
+          <p>{error}</p>
+        </div>
+      </MainLayout>
+    )
+  }
+
+  if (isLoading) {
+    return (
+      <MainLayout title="Dashboard" subtitle="Welcome back!">
+        <div style={{ padding: '2rem', textAlign: 'center' }}>
+          <p>Loading dashboard data...</p>
+        </div>
+      </MainLayout>
+    )
+  }
+
   return (
     <MainLayout title="Dashboard" subtitle="Welcome back!">
       <section className={styles.metricGrid}>

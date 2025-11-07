@@ -11,7 +11,7 @@ import type {
 } from '../types'
 
 type NewPurchaseProps = {
-  onSave: (lines: PurchaseLine[]) => boolean
+  onSave: (lines: PurchaseLine[]) => boolean | Promise<boolean>
 }
 
 const tabLabels: Record<PurchaseTab, string> = {
