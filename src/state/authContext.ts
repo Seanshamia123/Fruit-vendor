@@ -1,12 +1,14 @@
 import { createContext, useContext } from 'react'
+import type { VendorOut, LoginCredentials, VendorCreate } from '../services/types'
 
 export type OnboardingStatus = 'pending' | 'completed' | 'skipped' | 'deferred'
 
 export type AuthContextValue = {
   isAuthenticated: boolean
   onboardingStatus: OnboardingStatus
-  signIn: () => OnboardingStatus
-  signUp: () => OnboardingStatus
+  vendor: VendorOut | null
+  signIn: (credentials: LoginCredentials) => Promise<OnboardingStatus>
+  signUp: (data: VendorCreate) => Promise<OnboardingStatus>
   signOut: () => void
   markOnboardingStatus: (status: OnboardingStatus) => void
 }

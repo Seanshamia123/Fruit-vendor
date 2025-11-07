@@ -21,6 +21,7 @@ class Product(Base):
     purchases = relationship("Purchase", back_populates="product", cascade="all, delete-orphan")
     inventories = relationship("Inventory", back_populates="product", cascade="all, delete-orphan")
     mpesa_transactions = relationship("MpesaTransaction", back_populates="product", cascade="all, delete-orphan")
+    spoilage_entries = relationship("SpoilageEntry", back_populates="product", cascade="all, delete-orphan")
 
     pricings = relationship(
         "ProductPricing",

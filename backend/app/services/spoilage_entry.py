@@ -4,8 +4,8 @@ from app.schemas.spoilage_entry import SpoilageEntryCreate, SpoilageEntryUpdate
 from typing import List, Optional
 
 
-def create_spoilage_entry(db: Session, entry: SpoilageEntryCreate) -> SpoilageEntry:
-    db_entry = SpoilageEntry(**entry.dict())
+def create_spoilage_entry(db: Session, vendor_id: int, entry: SpoilageEntryCreate) -> SpoilageEntry:
+    db_entry = SpoilageEntry(**entry.dict(), vendor_id=vendor_id)
     db.add(db_entry)
     db.commit()
     db.refresh(db_entry)
@@ -16,8 +16,8 @@ def get_spoilage_entry(db: Session, entry_id: int) -> Optional[SpoilageEntry]:
     return db.query(SpoilageEntry).filter(SpoilageEntry.id == entry_id).first()
 
 
-def get_all_spoilage_entries(db: Session, skip: int = 0, limit: int = 100) -> List[SpoilageEntry]:
-    return db.query(SpoilageEntry).offset(skip).limit(limit).all()
+def get_all_spoilage_entries(db: Session, vendor_id: int, skip: int = 0, limit: int = 100) -> List[SpoilageEntry]:
+    return db.query(SpoilageEntry).filter(SpoilageEntry.vendor_id == vendor_id).offset(skip).limit(limit).all()
 
 
 def update_spoilage_entry(db: Session, entry_id: int, entry_update: SpoilageEntryUpdate) -> Optional[SpoilageEntry]:

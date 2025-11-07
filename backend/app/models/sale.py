@@ -28,3 +28,4 @@ class Sale(Base):
     # Relationships
     vendor = relationship("Vendor", back_populates="sales")
     product = relationship("Product", back_populates="sales")
+    payments = relationship("Payment", back_populates="sale", cascade="all, delete-orphan")

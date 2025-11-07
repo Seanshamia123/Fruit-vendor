@@ -6,8 +6,8 @@ import ProductManagement from './components/ProductManagement'
 import InventoryOverview from './components/InventoryOverview'
 import InventoryAlerts from './components/InventoryAlerts'
 import PurchaseRecords from './components/PurchaseRecords'
-import { inventoryItems, purchaseHistory } from './data'
-import type { InventoryItem, PurchaseHistory, PurchaseLine } from './types'
+import { useInventoryData } from '../../hooks/useInventoryData'
+import type { PurchaseLine } from './types'
 
 type InventoryView = 'new_purchase' | 'product_management' | 'overview' | 'alerts' | 'records'
 
@@ -19,112 +19,22 @@ const viewLabels: Record<InventoryView, string> = {
   records: 'Purchase Records',
 }
 
-const formatDate = (date: Date) =>
-  date.toLocaleDateString('en-KE', { month: 'short', day: 'numeric', year: 'numeric' })
-
-const formatQuantity = (value: number, unit: string) => {
-  if (Number.isNaN(value)) return `0 ${unit}`
-  if (unit === 'pieces' || unit === 'units') {
-    return `${Math.round(value)} ${unit}`
-  }
-  const formatted = Number(value.toFixed(1))
-  return `${formatted % 1 === 0 ? formatted.toFixed(0) : formatted.toFixed(1)} ${unit}`
-}
-
-const normaliseUnit = (unit: string) => unit.trim().toLowerCase()
-
-const parseQuantity = (input: string) => {
-  const parts = input.split(' ')
-  const value = Number(parts[0])
-  const unit = parts.slice(1).join(' ').trim()
-  return { value: Number.isNaN(value) ? 0 : value, unit }
-}
-
 const InventoryPage = () => {
   const [activeView, setActiveView] = useState<InventoryView>('new_purchase')
-  const [inventoryList, setInventoryList] = useState<InventoryItem[]>(inventoryItems)
-  const [purchaseRecordsList, setPurchaseRecordsList] = useState<PurchaseHistory[]>(purchaseHistory)
+  const {
+    isLoading,
+    error,
+    inventoryItems: inventoryList,
+    purchaseRecords: purchaseRecordsList,
+    handleSavePurchase: savePurchaseToApi,
+  } = useInventoryData()
 
-  const handleSavePurchase = (lines: PurchaseLine[]): boolean => {
-    if (!lines.length) return false
-
-    const purchaseDate = new Date()
-    const totalAmount = lines.reduce((sum, line) => sum + Number(line.quantity || 0) * Number(line.unitCost || 0), 0)
-
-    setInventoryList((prev) => {
-      const next = [...prev]
-
-      const ensureUniqueId = (base: string) => {
-        let slug = base.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '') || `item-${Date.now()}`
-        let counter = 1
-        while (next.some((item) => item.id === slug)) {
-          slug = `${slug}-${counter}`
-          counter += 1
-        }
-        return slug
-      }
-
-      lines.forEach((line) => {
-        const quantityValue = Number(line.quantity)
-        const unitCostValue = Number(line.unitCost)
-        if (!quantityValue || !unitCostValue) return
-
-        if (line.id) {
-          const index = next.findIndex((item) => item.id === line.id)
-          if (index !== -1) {
-            const existing = next[index]
-            const { value: currentValue, unit: currentUnit } = parseQuantity(existing.quantity)
-            if (currentUnit && normaliseUnit(currentUnit) === normaliseUnit(line.unit)) {
-              const updatedQuantity = formatQuantity(currentValue + quantityValue, currentUnit)
-              next[index] = {
-                ...existing,
-                quantity: updatedQuantity,
-                unitPrice: `KSh ${unitCostValue.toLocaleString('en-KE')}/${line.unit}`,
-              }
-            } else {
-              next[index] = {
-                ...existing,
-                quantity: `${existing.quantity} (+${line.quantity} ${line.unit})`,
-                unitPrice: `KSh ${unitCostValue.toLocaleString('en-KE')}/${line.unit}`,
-                notes: `Mixed unit purchase recorded on ${formatDate(purchaseDate)}`,
-              }
-            }
-            return
-          }
-        }
-
-        const newId = ensureUniqueId(line.name)
-        next.push({
-          id: newId,
-          name: line.name,
-          quantity: formatQuantity(quantityValue, line.unit),
-          unitPrice: `KSh ${unitCostValue.toLocaleString('en-KE')}/${line.unit}`,
-          category: line.category ?? 'Other',
-          status: 'Good',
-          addedOn: formatDate(purchaseDate),
-          expiresOn: 'Not set',
-        })
-      })
-
-      return next
-    })
-
-    setPurchaseRecordsList((prev) => {
-      const recordNumber = prev.length + 1
-      const newRecord: PurchaseHistory = {
-        id: `PUR-${String(recordNumber).padStart(3, '0')}`,
-        supplier: 'Local Supplier',
-        date: formatDate(purchaseDate),
-        status: 'Complete',
-        total: `KSh ${totalAmount.toLocaleString('en-KE', { minimumFractionDigits: 0 })}`,
-        items: lines.map((line) => `${line.name} (${line.quantity} ${line.unit})`),
-      }
-
-      return [newRecord, ...prev]
-    })
-
-    setActiveView('records')
-    return true
+  const handleSavePurchase = async (lines: PurchaseLine[]): Promise<boolean> => {
+    const success = await savePurchaseToApi(lines)
+    if (success) {
+      setActiveView('records')
+    }
+    return success
   }
 
   const renderActiveView = () => {
@@ -145,6 +55,27 @@ const InventoryPage = () => {
   }
 
   const activeViewLabel = useMemo(() => viewLabels[activeView], [activeView])
+
+  if (error) {
+    return (
+      <MainLayout title="Inventory" subtitle="Manage stock, purchases, and product alerts">
+        <div style={{ padding: '2rem', textAlign: 'center' }}>
+          <h2 style={{ color: '#c00', marginBottom: '1rem' }}>Error loading inventory</h2>
+          <p>{error}</p>
+        </div>
+      </MainLayout>
+    )
+  }
+
+  if (isLoading) {
+    return (
+      <MainLayout title="Inventory" subtitle="Manage stock, purchases, and product alerts">
+        <div style={{ padding: '2rem', textAlign: 'center' }}>
+          <p>Loading inventory data...</p>
+        </div>
+      </MainLayout>
+    )
+  }
 
   return (
     <MainLayout title="Inventory" subtitle="Manage stock, purchases, and product alerts">

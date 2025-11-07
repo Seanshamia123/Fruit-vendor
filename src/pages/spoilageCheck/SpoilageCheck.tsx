@@ -2,13 +2,10 @@ import { useMemo, useState } from 'react'
 import MainLayout from '../../layouts/MainLayout'
 import EmptyStateCard from '../../components/emptyState/EmptyStateCard'
 import styles from './SpoilageCheck.module.css'
-import {
-  attentionItems,
-  lastCheck,
-  recommendedActions,
-  riskSummaries,
-  type RiskLevel,
-} from './data'
+import { useSpoilageData } from '../../hooks/useSpoilageData'
+import { recommendedActions } from './data'
+
+type RiskLevel = 'critical' | 'high' | 'medium' | 'low'
 
 const riskOrder: RiskLevel[] = ['critical', 'high', 'medium', 'low']
 
@@ -62,6 +59,7 @@ const iconBackground: Record<RiskLevel, string> = {
 }
 
 const SpoilageCheck = () => {
+  const { isLoading, error, attentionItems, riskSummaries, lastCheck } = useSpoilageData()
   const [query, setQuery] = useState('')
   const [activeRisk, setActiveRisk] = useState<RiskLevel | 'all'>('all')
 
@@ -74,7 +72,7 @@ const SpoilageCheck = () => {
       const haystack = `${item.name} ${item.category}`.toLowerCase()
       return haystack.includes(normalizedQuery)
     })
-  }, [query, activeRisk])
+  }, [query, activeRisk, attentionItems])
 
   const subtitle = useMemo(() => {
     const baseCount = riskSummaries.find((summary) => summary.level === activeRisk)?.count ?? attentionItems.length
@@ -83,13 +81,49 @@ const SpoilageCheck = () => {
     }
     const filterDescription = activeRisk === 'all' ? 'items flagged' : `${activeRisk} risk`
     return `${filteredItems.length} of ${baseCount} ${filterDescription}`
-  }, [filteredItems.length, activeRisk])
+  }, [filteredItems.length, activeRisk, riskSummaries, attentionItems.length])
+
+  // Transform risk summaries to include labels
+  const riskSummariesWithLabels = useMemo(() => {
+    const labels: Record<string, string> = {
+      all: 'All',
+      critical: 'Critical',
+      high: 'High',
+      medium: 'Medium',
+      low: 'Low',
+    }
+    return riskSummaries.map((summary) => ({
+      ...summary,
+      label: labels[summary.level] ?? summary.level,
+    }))
+  }, [riskSummaries])
 
   const headerAction = (
     <button type="button" className={styles.completeButton}>
       Start Check
     </button>
   )
+
+  if (error) {
+    return (
+      <MainLayout title="Spoilage Alerts" subtitle={`Last check: ${lastCheck}`} trailing={headerAction}>
+        <div style={{ padding: '2rem', textAlign: 'center' }}>
+          <h2 style={{ color: '#c00', marginBottom: '1rem' }}>Error loading spoilage data</h2>
+          <p>{error}</p>
+        </div>
+      </MainLayout>
+    )
+  }
+
+  if (isLoading) {
+    return (
+      <MainLayout title="Spoilage Alerts" subtitle={`Last check: ${lastCheck}`} trailing={headerAction}>
+        <div style={{ padding: '2rem', textAlign: 'center' }}>
+          <p>Loading spoilage data...</p>
+        </div>
+      </MainLayout>
+    )
+  }
 
   return (
     <MainLayout title="Spoilage Alerts" subtitle={`Last check: ${lastCheck}`} trailing={headerAction}>
@@ -121,7 +155,7 @@ const SpoilageCheck = () => {
           </div>
 
           <div className={styles.segmentGroup}>
-            {riskSummaries.map((summary) => (
+            {riskSummariesWithLabels.map((summary) => (
               <button
                 key={summary.label}
                 type="button"
@@ -135,7 +169,7 @@ const SpoilageCheck = () => {
         </section>
 
         <section className={styles.summaryGrid}>
-          {riskSummaries
+          {riskSummariesWithLabels
             .filter((summary) => summary.level !== 'all')
             .sort((a, b) => riskOrder.indexOf(a.level as RiskLevel) - riskOrder.indexOf(b.level as RiskLevel))
             .map((summary) => (

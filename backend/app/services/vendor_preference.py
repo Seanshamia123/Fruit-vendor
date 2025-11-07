@@ -2,9 +2,9 @@ from sqlalchemy.orm import Session
 from app.models.vendor_preference import VendorPreference
 from app.schemas.vendor_preference import VendorPreferenceCreate, VendorPreferenceUpdate
 
-def create_vendor_preference(db: Session, pref: VendorPreferenceCreate):
+def create_vendor_preference(db: Session, vendor_id: int, pref: VendorPreferenceUpdate):
     db_pref = VendorPreference(
-        vendor_id=pref.vendor_id,
+        vendor_id=vendor_id,
         dashboard_metrics=pref.dashboard_metrics,
         color_theme=pref.color_theme,
         display_options=pref.display_options,
