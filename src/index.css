@@ -1,4 +1,11 @@
+<<<<<<< HEAD
 @import "tailwindcss";
+=======
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+>>>>>>> d9d4693c2aed1759119bea1c1ef8470842d8cd81
 :root {
   font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
   line-height: 1.5;
@@ -25,6 +32,11 @@ a:hover {
 
 body {
   margin: 0;
+<<<<<<< HEAD
+=======
+  display: flex;
+  place-items: center;
+>>>>>>> d9d4693c2aed1759119bea1c1ef8470842d8cd81
   min-width: 320px;
   min-height: 100vh;
 }
@@ -65,6 +77,7 @@ button:focus-visible {
     background-color: #f9f9f9;
   }
 }
+<<<<<<< HEAD
 
 /* Simple page fade/slide-in animation */
 @keyframes page-in {
@@ -80,3 +93,5 @@ button:focus-visible {
 .animate-page {
   animation: page-in 220ms ease-out both;
 }
+=======
+>>>>>>> d9d4693c2aed1759119bea1c1ef8470842d8cd81
