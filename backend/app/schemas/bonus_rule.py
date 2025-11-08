@@ -7,6 +7,7 @@ class BonusRuleBase(BaseModel):
     threshold_qty: float
     bonus_qty: Optional[float] = None
     bonus_discount: Optional[float] = None
+    is_active: bool = True
 
 class BonusRuleCreate(BonusRuleBase):
     pass
@@ -16,6 +17,7 @@ class BonusRuleUpdate(BaseModel):
     threshold_qty: Optional[float] = None
     bonus_qty: Optional[float] = None
     bonus_discount: Optional[float] = None
+    is_active: Optional[bool] = None
 
 class BonusRuleOut(BonusRuleBase):
     id: int

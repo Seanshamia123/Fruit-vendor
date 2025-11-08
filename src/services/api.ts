@@ -4,6 +4,7 @@ import type {
   LoginCredentials,
   VendorCreate,
   VendorOut,
+  OnboardingData,
   Product,
   ProductCreate,
   Sale,
@@ -19,6 +20,7 @@ import type {
   SpoilageEntryCreate,
   VendorPreference,
   VendorPreferenceCreate,
+  VendorPreferenceUpdate,
   Cart,
   CartItem,
   CartItemCreate,
@@ -48,6 +50,12 @@ export const authApi = {
       auth: false,
     })
   },
+
+  completeOnboarding: (data: OnboardingData) =>
+    apiFetch<VendorOut>('/auth/complete-onboarding', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    }),
 }
 
 // ==================== PRODUCT API ====================

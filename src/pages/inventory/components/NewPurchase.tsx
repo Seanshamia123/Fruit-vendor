@@ -1,6 +1,5 @@
 import { useMemo, useState } from 'react'
 import styles from '../Inventory.module.css'
-import { purchaseCandidates } from '../data'
 import type {
   InventoryCategory,
   PurchaseCandidate,
@@ -12,6 +11,7 @@ import type {
 
 type NewPurchaseProps = {
   onSave: (lines: PurchaseLine[]) => boolean | Promise<boolean>
+  candidates: PurchaseCandidate[]
 }
 
 const tabLabels: Record<PurchaseTab, string> = {
@@ -24,7 +24,7 @@ const categoryOptions: InventoryCategory[] = ['Vegetables', 'Fruits', 'Dairy', '
 
 const formatCurrency = (value: number) => `KSh ${value.toLocaleString('en-KE', { minimumFractionDigits: 0 })}`
 
-const NewPurchase = ({ onSave }: NewPurchaseProps) => {
+const NewPurchase = ({ onSave, candidates }: NewPurchaseProps) => {
   const [activeTab, setActiveTab] = useState<PurchaseTab>('existing')
   const [selectedItems, setSelectedItems] = useState<Record<string, PurchaseCandidate>>({})
   const [drafts, setDrafts] = useState<Record<string, PurchaseDraft>>({})
@@ -38,6 +38,7 @@ const NewPurchase = ({ onSave }: NewPurchaseProps) => {
   })
   const [formMessage, setFormMessage] = useState<string | null>(null)
   const [formError, setFormError] = useState<string | null>(null)
+  const [isSaving, setIsSaving] = useState(false)
 
   const toggleItem = (item: PurchaseCandidate) => {
     setSelectedItems((prev) => {
@@ -160,9 +161,11 @@ const NewPurchase = ({ onSave }: NewPurchaseProps) => {
     return entry.line.name.trim().length > 0 && quantityValue > 0 && costValue > 0
   })
 
-  const handleSavePurchase = () => {
-    if (!canSave) {
-      setFormError('Add at least one item with quantity and price to save the purchase.')
+  const handleSavePurchase = async () => {
+    if (!canSave || isSaving) {
+      if (!canSave) {
+        setFormError('Add at least one item with quantity and price to save the purchase.')
+      }
       return
     }
 
@@ -187,13 +190,23 @@ const NewPurchase = ({ onSave }: NewPurchaseProps) => {
       }
     })
 
-    const success = onSave(payload)
-    if (success) {
-      setSelectedItems({})
-      setDrafts({})
-      setCustomLines([])
-      setFormError(null)
-      setFormMessage('Purchase saved! Inventory and records have been updated.')
+    setFormError(null)
+    setFormMessage(null)
+    setIsSaving(true)
+    try {
+      const success = await onSave(payload)
+      if (success) {
+        setSelectedItems({})
+        setDrafts({})
+        setCustomLines([])
+        setFormMessage('Purchase saved! Inventory and records have been updated.')
+      } else {
+        setFormError('Failed to save purchase. Please try again.')
+      }
+    } catch (error) {
+      setFormError(error instanceof Error ? error.message : 'Failed to save purchase. Please try again.')
+    } finally {
+      setIsSaving(false)
     }
   }
 
@@ -227,25 +240,32 @@ const NewPurchase = ({ onSave }: NewPurchaseProps) => {
 
         {activeTab === 'existing' ? (
           <div className={styles.listStack}>
-            {purchaseCandidates.map((candidate) => {
-              const isSelected = Boolean(selectedItems[candidate.id])
-              return (
-                <button
-                  key={candidate.id}
-                  type="button"
-                  className={`${styles.productOption} ${isSelected ? styles.productOptionSelected : ''}`}
-                  onClick={() => toggleItem(candidate)}
-                >
-                  <div>
-                    <p className={styles.productName}>{candidate.name}{candidate.variety ? ` (${candidate.variety})` : ''}</p>
-                    <p className={styles.productMeta}>
-                      {candidate.category} • Last price: {candidate.lastPrice}
-                    </p>
-                  </div>
-                  <span className={styles.quantityBadge}>{candidate.availableQuantity}</span>
-                </button>
-              )
-            })}
+            {candidates.length === 0 ? (
+              <div className={styles.emptyState}>
+                <p className={styles.emptyTitle}>No products available</p>
+                <p className={styles.emptySubtitle}>Create products first to see them here.</p>
+              </div>
+            ) : (
+              candidates.map((candidate) => {
+                const isSelected = Boolean(selectedItems[candidate.id])
+                return (
+                  <button
+                    key={candidate.id}
+                    type="button"
+                    className={`${styles.productOption} ${isSelected ? styles.productOptionSelected : ''}`}
+                    onClick={() => toggleItem(candidate)}
+                  >
+                    <div>
+                      <p className={styles.productName}>{candidate.name}{candidate.variety ? ` (${candidate.variety})` : ''}</p>
+                      <p className={styles.productMeta}>
+                        {candidate.category} • Last price: {candidate.lastPrice}
+                      </p>
+                    </div>
+                    <span className={styles.quantityBadge}>{candidate.availableQuantity}</span>
+                  </button>
+                )
+              })
+            )}
           </div>
         ) : (
           <div className={styles.newPurchaseForm}>
@@ -452,8 +472,15 @@ const NewPurchase = ({ onSave }: NewPurchaseProps) => {
               <button type="button" className={styles.secondaryButton} onClick={clearForm}>
                 Clear
               </button>
-              <button type="button" className={styles.saveButton} onClick={handleSavePurchase} disabled={!canSave}>
-                Save Purchase
+              <button
+                type="button"
+                className={styles.saveButton}
+                onClick={() => {
+                  void handleSavePurchase()
+                }}
+                disabled={!canSave || isSaving}
+              >
+                {isSaving ? 'Saving...' : 'Save Purchase'}
               </button>
             </div>
           </div>

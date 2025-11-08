@@ -26,6 +26,12 @@ class VendorPreferenceBase(BaseModel):
     # Loyalty/rewards
     loyalty_enabled: Optional[bool] = True
 
+    # Onboarding data
+    business_type: Optional[str] = None
+    products_of_interest: Optional[List[str]] = None
+    challenges: Optional[List[str]] = None
+    goals: Optional[List[str]] = None
+
 class VendorPreferenceCreate(VendorPreferenceBase):
     vendor_id: int
 

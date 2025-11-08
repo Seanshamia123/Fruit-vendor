@@ -3,11 +3,43 @@ import Button from '../../components/Button'
 import MainLayout from '../../layouts/MainLayout'
 import SectionTabs from '../../components/priceManagement/SectionTabs'
 import styles from './PriceManagementOverview.module.css'
-import { priceMetrics, productPrices, pricingTips } from './data'
+import { pricingTips } from './data'
+import { usePriceManagement } from '../../hooks/usePriceManagement'
 
 const PriceManagementOverview = () => {
   const navigate = useNavigate()
+  const {
+    isLoading,
+    error,
+    priceMetrics,
+    productPrices,
+  } = usePriceManagement()
+
   const hasProducts = productPrices.length > 0
+
+  if (isLoading) {
+    return (
+      <MainLayout
+        title="Price Management"
+        subtitle="Monitor pricing performance across your catalog"
+      >
+        <div style={{ padding: '2rem', textAlign: 'center' }}>Loading price data...</div>
+      </MainLayout>
+    )
+  }
+
+  if (error) {
+    return (
+      <MainLayout
+        title="Price Management"
+        subtitle="Monitor pricing performance across your catalog"
+      >
+        <div style={{ padding: '2rem', textAlign: 'center', color: '#ef4444' }}>
+          Error loading price data: {error}
+        </div>
+      </MainLayout>
+    )
+  }
 
   return (
     <MainLayout

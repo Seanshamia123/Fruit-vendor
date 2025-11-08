@@ -32,4 +32,10 @@ class VendorPreference(Base):
     # Loyalty/rewards
     loyalty_enabled = Column(Boolean, nullable=True, default=True)
 
+    # Onboarding data
+    business_type = Column(String(100), nullable=True)  # retail/market/grocery/salon/home/other
+    products_of_interest = Column(JSON, nullable=True)  # list of product categories selected
+    challenges = Column(JSON, nullable=True)  # list of challenges selected during onboarding
+    goals = Column(JSON, nullable=True)  # list of goals selected during onboarding
+
     vendor = relationship("Vendor", back_populates="preferences")

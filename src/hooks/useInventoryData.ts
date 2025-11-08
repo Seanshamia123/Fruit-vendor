@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback } from 'react'
 import { productApi, inventoryApi, purchaseApi } from '../services/api'
 import type { Product, Inventory } from '../services/types'
-import type { InventoryItem, PurchaseHistory, PurchaseLine } from '../pages/inventory/types'
+import type { InventoryItem, PurchaseHistory, PurchaseLine, PurchaseCandidate } from '../pages/inventory/types'
 
 const formatDate = (date: Date) =>
   date.toLocaleDateString('en-KE', { month: 'short', day: 'numeric', year: 'numeric' })
@@ -24,6 +24,7 @@ export const useInventoryData = () => {
 
   const [inventoryItems, setInventoryItems] = useState<InventoryItem[]>([])
   const [purchaseRecords, setPurchaseRecords] = useState<PurchaseHistory[]>([])
+  const [purchaseCandidates, setPurchaseCandidates] = useState<PurchaseCandidate[]>([])
 
   const fetchData = useCallback(async () => {
     try {
@@ -86,6 +87,31 @@ export const useInventoryData = () => {
         })
 
       setPurchaseRecords(records)
+
+      // Generate purchase candidates from products
+      const candidates: PurchaseCandidate[] = productsData.map((product) => {
+        const productInventory = inventoryData.find((inv) => inv.product_id === product.id)
+        const productPurchases = purchasesData.filter((p) => p.product_id === product.id)
+        const latestPurchase = productPurchases.sort(
+          (a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime()
+        )[0]
+
+        const quantity = productInventory?.quantity ?? 0
+        const lastPrice = latestPurchase
+          ? `KSh ${latestPurchase.unit_cost.toLocaleString('en-KE', { minimumFractionDigits: 0 })}`
+          : 'KSh 0'
+
+        return {
+          id: product.id.toString(),
+          name: product.name,
+          variety: product.variation ?? undefined,
+          category: 'Other',
+          lastPrice,
+          availableQuantity: formatQuantity(quantity, product.unit),
+        }
+      })
+
+      setPurchaseCandidates(candidates)
     } catch (err) {
       console.error('Failed to fetch inventory data:', err)
       setError(err instanceof Error ? err.message : 'Failed to load inventory data')
@@ -210,6 +236,7 @@ export const useInventoryData = () => {
     products,
     inventoryItems,
     purchaseRecords,
+    purchaseCandidates,
     handleSavePurchase,
     handleCreateProduct,
     handleToggleProductStatus,

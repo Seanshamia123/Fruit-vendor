@@ -1,12 +1,68 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
+import { inventoryApi, productApi } from '../../../services/api'
 import styles from '../Inventory.module.css'
-import { alertPlans } from '../data'
+
+type AlertPlan = {
+  id: string
+  productName: string
+  current: number
+  threshold: number
+  status: 'Good' | 'Low' | 'Out' | 'Spoiled'
+  enabled: boolean
+}
 
 const InventoryAlerts = () => {
   const [alertsEnabled, setAlertsEnabled] = useState(true)
   const [dailySummary, setDailySummary] = useState(true)
   const [soundEnabled, setSoundEnabled] = useState(false)
-  const [plans, setPlans] = useState(alertPlans)
+  const [plans, setPlans] = useState<AlertPlan[]>([])
+  const [isLoading, setIsLoading] = useState(true)
+
+  useEffect(() => {
+    const fetchInventoryData = async () => {
+      try {
+        const [inventory, products] = await Promise.all([
+          inventoryApi.list(),
+          productApi.list(),
+        ])
+
+        const alertPlans: AlertPlan[] = inventory.map((inv) => {
+          const product = products.find((p) => p.id === inv.product_id)
+          const threshold = 10 // Default threshold, could be configurable
+
+          let status: AlertPlan['status'] = 'Good'
+          if (inv.quantity === 0) status = 'Out'
+          else if (inv.quantity < threshold) status = 'Low'
+
+          // TODO: Check for spoilage when backend supports expiry dates
+          // if (inv.expiry_date) {
+          //   const daysUntilExpiry = Math.ceil(
+          //     (new Date(inv.expiry_date).getTime() - Date.now()) / (1000 * 60 * 60 * 24)
+          //   )
+          //   if (daysUntilExpiry <= 0) status = 'Spoiled'
+          //   else if (daysUntilExpiry <= 3 && status === 'Good') status = 'Low'
+          // }
+
+          return {
+            id: inv.id.toString(),
+            productName: product?.name || `Product ${inv.product_id}`,
+            current: inv.quantity,
+            threshold,
+            status,
+            enabled: true,
+          }
+        })
+
+        setPlans(alertPlans)
+      } catch (error) {
+        console.error('Failed to fetch inventory data:', error)
+      } finally {
+        setIsLoading(false)
+      }
+    }
+
+    fetchInventoryData()
+  }, [])
   const enabledCount = plans.filter((plan) => plan.enabled).length
   const statusBreakdown = plans.reduce(
     (acc, plan) => {
@@ -21,6 +77,14 @@ const InventoryAlerts = () => {
 
   const togglePlan = (id: string) => {
     setPlans((prev) => prev.map((plan) => (plan.id === id ? { ...plan, enabled: !plan.enabled } : plan)))
+  }
+
+  if (isLoading) {
+    return (
+      <div className={styles.alertsRoot}>
+        <div style={{ padding: '2rem', textAlign: 'center' }}>Loading alert plans...</div>
+      </div>
+    )
   }
 
   return (
@@ -105,8 +169,8 @@ const InventoryAlerts = () => {
               <article key={plan.id} className={styles.alertPlanCard}>
                 <header className={styles.alertPlanHeader}>
                   <div>
-                    <h4 className={styles.productName}>{plan.name}</h4>
-                    <p className={styles.productMeta}>{plan.category} • Status: {plan.status}</p>
+                    <h4 className={styles.productName}>{plan.productName}</h4>
+                    <p className={styles.productMeta}>Current: {plan.current} • Threshold: {plan.threshold} • Status: {plan.status}</p>
                   </div>
                   <button type="button" className={`${styles.toggleSwitchSmall} ${plan.enabled ? styles.toggleSwitchOn : ''}`} onClick={() => togglePlan(plan.id)} aria-label="Toggle plan">
                     <span className={styles.toggleThumb} />
@@ -116,23 +180,9 @@ const InventoryAlerts = () => {
                   <label>
                     <span>Low-stock warning</span>
                     <div className={styles.sliderTrack}>
-                      <div className={styles.sliderFill} style={{ width: `${plan.reorderThreshold}%` }} />
+                      <div className={styles.sliderFill} style={{ width: `${(plan.threshold / 20) * 100}%` }} />
                     </div>
-                    <span className={styles.sliderValue}>{plan.reorderThreshold} kg</span>
-                  </label>
-                  <label>
-                    <span>Critical alert level</span>
-                    <div className={styles.sliderTrack}>
-                      <div className={styles.sliderFillCritical} style={{ width: `${plan.criticalThreshold}%` }} />
-                    </div>
-                    <span className={styles.sliderValue}>{plan.criticalThreshold} kg</span>
-                  </label>
-                  <label>
-                    <span>Expiry warning</span>
-                    <div className={styles.sliderTrack}>
-                      <div className={styles.sliderFillSoft} style={{ width: `${plan.expiryWarningDays * 10}%` }} />
-                    </div>
-                    <span className={styles.sliderValue}>{plan.expiryWarningDays} days</span>
+                    <span className={styles.sliderValue}>{plan.threshold} units</span>
                   </label>
                 </div>
               </article>

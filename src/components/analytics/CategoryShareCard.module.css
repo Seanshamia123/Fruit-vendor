@@ -1,12 +1,18 @@
 .card {
   background: #ffffff;
-  border-radius: 1.75rem;
+  border-radius: 1.5rem;
   border: 1px solid #e2e8f0;
-  box-shadow: 0 24px 48px rgba(15, 23, 42, 0.08);
-  padding: 1.6rem;
+  box-shadow: 0 1px 3px rgba(15, 23, 42, 0.08);
+  padding: 1.5rem;
   display: flex;
   flex-direction: column;
-  gap: 1.4rem;
+  gap: 1.25rem;
+  height: fit-content;
+  transition: box-shadow 0.2s ease;
+}
+
+.card:hover {
+  box-shadow: 0 4px 12px rgba(15, 23, 42, 0.12);
 }
 
 .title {
@@ -19,13 +25,34 @@
 .content {
   display: flex;
   align-items: center;
-  gap: 1.5rem;
+  gap: 1.8rem;
   flex-wrap: wrap;
 }
 
+.chartContainer {
+  position: relative;
+  flex-shrink: 0;
+}
+
 .chart {
-  width: 180px;
-  height: 180px;
+  width: 140px;
+  height: 140px;
+  display: block;
+}
+
+.centerValue {
+  font-size: 5.5px;
+  font-weight: 700;
+  fill: #0f172a;
+  letter-spacing: -0.02em;
+}
+
+.centerLabel {
+  font-size: 3px;
+  font-weight: 500;
+  fill: #94a3b8;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
 }
 
 .legend {
@@ -34,29 +61,36 @@
   padding: 0;
   display: flex;
   flex-direction: column;
-  gap: 0.8rem;
+  gap: 0.7rem;
+  flex: 1;
+  min-width: 140px;
 }
 
 .legendItem {
   display: grid;
   grid-template-columns: auto 1fr auto;
   align-items: center;
-  gap: 0.75rem;
+  gap: 0.65rem;
+  padding: 0.35rem 0;
 }
 
 .swatch {
-  width: 12px;
-  height: 12px;
+  width: 10px;
+  height: 10px;
   border-radius: 999px;
+  box-shadow: 0 2px 8px currentColor;
+  opacity: 0.85;
 }
 
 .legendLabel {
-  font-size: 0.9rem;
-  color: #1f2937;
+  font-size: 0.875rem;
+  color: #475569;
+  font-weight: 500;
 }
 
 .legendValue {
-  font-size: 0.9rem;
+  font-size: 0.875rem;
   font-weight: 700;
   color: #0f172a;
+  tabular-nums: true;
 }

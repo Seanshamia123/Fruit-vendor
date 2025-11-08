@@ -1,12 +1,17 @@
 .card {
   background: #ffffff;
   border: 1px solid #e2e8f0;
-  border-radius: 1.75rem;
-  box-shadow: 0 24px 48px rgba(15, 23, 42, 0.08);
-  padding: 1.75rem;
+  border-radius: 1.5rem;
+  box-shadow: 0 1px 3px rgba(15, 23, 42, 0.08);
+  padding: 1.5rem;
   display: flex;
   flex-direction: column;
-  gap: 1.5rem;
+  gap: 1.25rem;
+  transition: box-shadow 0.2s ease;
+}
+
+.card:hover {
+  box-shadow: 0 4px 12px rgba(15, 23, 42, 0.12);
 }
 
 .header {
@@ -79,12 +84,91 @@
 }
 
 .chartWrapper {
+  position: relative;
   width: 100%;
+  max-width: 100%;
+  overflow: visible;
+}
+
+.chartWrapper svg {
+  display: block;
+  max-height: 240px;
 }
 
 .axisLabel {
   fill: #94a3b8;
-  font-size: 11px;
+  font-size: 10.5px;
+  font-weight: 500;
+  letter-spacing: 0.02em;
+}
+
+.tooltip {
+  position: absolute;
+  min-width: 110px;
+  background: #0f172a;
+  color: #fff;
+  padding: 0.65rem 0.85rem;
+  border-radius: 0.75rem;
+  box-shadow: 0 12px 30px rgba(15, 23, 42, 0.35);
+  pointer-events: none;
+}
+
+.tooltipLabel {
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.tooltipValue {
+  display: block;
+  font-size: 1rem;
+  margin: 0.25rem 0;
+}
+
+.tooltipDelta {
+  font-size: 0.75rem;
+  color: rgba(255, 255, 255, 0.75);
+}
+
+.summaryRow {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 1rem;
+}
+
+.summaryItem {
+  background: #f8fafc;
+  border-radius: 1rem;
+  padding: 0.9rem 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+}
+
+.summaryLabel {
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  color: #94a3b8;
+  letter-spacing: 0.08em;
+}
+
+.summaryItem strong {
+  font-size: 1rem;
+  color: #0f172a;
+}
+
+.summaryItem span:last-child {
+  font-size: 0.8rem;
+  color: #64748b;
+}
+
+.positive {
+  color: #16a34a;
+}
+
+.negative {
+  color: #dc2626;
 }
 
 .table {
