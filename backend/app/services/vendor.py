@@ -1,12 +1,12 @@
 from sqlalchemy.orm import Session
-from app import models
+from app.models.vendor import Vendor
 from app.schemas.vendor import VendorCreate, VendorUpdate
 from app.core.security import get_password_hash
 
 
 def create_vendor(db: Session, vendor_in: VendorCreate):
     hashed_pw = get_password_hash(vendor_in.password)
-    db_vendor = models.Vendor(
+    db_vendor = Vendor(
         name=vendor_in.name,
         email=vendor_in.email,
         contact=vendor_in.contact,
@@ -20,19 +20,19 @@ def create_vendor(db: Session, vendor_in: VendorCreate):
 
 
 def get_vendor(db: Session, vendor_id: int):
-    return db.query(models.Vendor).filter(models.Vendor.id == vendor_id).first()
+    return db.query(Vendor).filter(Vendor.id == vendor_id).first()
 
 
 def get_vendor_by_email(db: Session, email: str):
-    return db.query(models.Vendor).filter(models.Vendor.email == email).first()
+    return db.query(Vendor).filter(Vendor.email == email).first()
 
 
 def get_all_vendors(db: Session, skip: int = 0, limit: int = 10):
-    return db.query(models.Vendor).offset(skip).limit(limit).all()
+    return db.query(Vendor).offset(skip).limit(limit).all()
 
 
 def update_vendor(db: Session, vendor_id: int, vendor_update: VendorUpdate):
-    vendor = db.query(models.Vendor).filter(models.Vendor.id == vendor_id).first()
+    vendor = db.query(Vendor).filter(Vendor.id == vendor_id).first()
     if not vendor:
         return None
 
@@ -49,7 +49,7 @@ def update_vendor(db: Session, vendor_id: int, vendor_update: VendorUpdate):
 
 
 def delete_vendor(db: Session, vendor_id: int):
-    vendor = db.query(models.Vendor).filter(models.Vendor.id == vendor_id).first()
+    vendor = db.query(Vendor).filter(Vendor.id == vendor_id).first()
     if not vendor:
         return None
     db.delete(vendor)

@@ -77,21 +77,12 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
       const authResponse = await authApi.login(credentials)
       persistToken(authResponse.access_token)
 
-      // For now, we'll create a mock vendor object since the login endpoint doesn't return vendor info
-      // In a real app, you'd want to fetch the current vendor info after login
-      const mockVendor: VendorOut = {
-        id: 1,
-        name: 'Vendor',
-        email: credentials.username,
-        contact: '',
-        created_at: new Date().toISOString(),
-      }
-
-      setVendor(mockVendor)
+      // Use the vendor object from the auth response
+      setVendor(authResponse.vendor)
       setIsAuthenticated(true)
 
-      const persisted = loadOnboarding()
-      const status = persisted?.status ?? 'pending'
+      // Check onboarding status from the backend
+      const status: OnboardingStatus = authResponse.vendor.onboarding_completed ? 'completed' : 'pending'
       setOnboardingStatus(status)
       return status
     } catch (error) {
@@ -102,7 +93,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
 
   const signUp = useCallback(async (data: VendorCreate): Promise<OnboardingStatus> => {
     try {
-      const newVendor = await authApi.register(data)
+      await authApi.register(data)
 
       // After registration, automatically log in
       const authResponse = await authApi.login({
@@ -111,10 +102,11 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
       })
 
       persistToken(authResponse.access_token)
-      setVendor(newVendor)
+      setVendor(authResponse.vendor)
       setIsAuthenticated(true)
 
       clearOnboarding()
+      // New users should always have onboarding_completed = false
       setOnboardingStatus('pending')
       return 'pending'
     } catch (error) {

@@ -7,6 +7,7 @@ export type VendorOut = {
   email: string
   contact: string
   location?: string | null
+  onboarding_completed: boolean
   created_at: string
 }
 
@@ -26,6 +27,7 @@ export type LoginCredentials = {
 export type AuthResponse = {
   access_token: string
   token_type: string
+  vendor: VendorOut
 }
 
 // Product Types
@@ -164,9 +166,17 @@ export type VendorPreference = {
   quick_sale_products?: string[]
   // Loyalty/rewards
   loyalty_enabled?: boolean
+  // Onboarding data
+  business_type?: string
+  products_of_interest?: string[]
+  challenges?: string[]
+  goals?: string[]
 }
 
 export type VendorPreferenceUpdate = Partial<Omit<VendorPreference, 'id' | 'vendor_id'>>
+
+// Server infers the vendor from the auth token, so create payload matches update
+export type VendorPreferenceCreate = VendorPreferenceUpdate
 
 // Cart Types
 export type Cart = {
@@ -226,4 +236,14 @@ export type PaymentCreate = {
   sale_id: number
   amount: number
   payment_method: string
+}
+
+// Onboarding Types
+export type OnboardingData = {
+  business_type: string
+  products_of_interest: string[]
+  challenges: string[]
+  goals: string[]
+  display_mode?: string
+  language?: string
 }

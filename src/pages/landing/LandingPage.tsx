@@ -1,9 +1,5 @@
-<<<<<<< HEAD
 import { useState } from 'react'
-import Button from '../../components/Button'
 import { AuthModal } from '../../components/AuthModal'
-=======
->>>>>>> sean
 import styles from './LandingPage.module.css'
 import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../../state/authContext'
@@ -171,51 +167,8 @@ const LandingPage = () => {
   }
 
   return (
-<<<<<<< HEAD
     <>
       <div className={styles.page}>
-        <div className={styles.shell}>
-          <section className={styles.hero}>
-            <h1 className={styles.title}>Run your fruit business with clarity.</h1>
-            <p className={styles.subtitle}>
-              Fruit Vendor keeps your team aligned on the metrics that matter—from daily sales to stock freshness—so you act fast and grow smarter.
-            </p>
-            <div className={styles.ctaGroup}>
-              <Button onClick={goToPrimaryAction}>
-                {isAuthenticated ? 'Continue to your workspace' : 'Sign in'}
-              </Button>
-              <Button variant="secondary" onClick={goToSecondaryAction}>
-                {isAuthenticated ? 'Review onboarding' : 'Create an account'}
-              </Button>
-            </div>
-            {!isAuthenticated && (
-              <p className={styles.secondaryAction}>
-                New here? <button type="button" onClick={goToSecondaryAction}>Get started in minutes</button>
-              </p>
-            )}
-          </section>
-
-          <section className={styles.featureGrid}>
-            {features.map((feature) => (
-              <article key={feature.title} className={styles.featureCard}>
-                <h2 className={styles.featureTitle}>{feature.title}</h2>
-                <p className={styles.featureCopy}>{feature.copy}</p>
-              </article>
-            ))}
-          </section>
-        </div>
-      </div>
-
-      {showAuthModal && (
-        <AuthModal
-          mode={showAuthModal}
-          onClose={() => setShowAuthModal(null)}
-          onSubmit={handleAuthSubmit}
-        />
-      )}
-    </>
-=======
-    <div className={styles.page}>
       <header className={styles.header} id="hero">
         <div className={styles.logo}>
           <span className={styles.logoMark} aria-hidden="true">
@@ -226,9 +179,20 @@ const LandingPage = () => {
             <p>Business app built for Africa</p>
           </div>
         </div>
-        <button type="button" className={styles.joinButton} onClick={goToOnboarding}>
-          {isAuthenticated ? 'Continue' : 'Join Now'}
-        </button>
+        {!isAuthenticated ? (
+          <div className={styles.headerButtons}>
+            <button type="button" className={styles.signInButton} onClick={() => setShowAuthModal('login')}>
+              Sign In
+            </button>
+            <button type="button" className={styles.joinButton} onClick={goToOnboarding}>
+              Join Now
+            </button>
+          </div>
+        ) : (
+          <button type="button" className={styles.joinButton} onClick={goToDashboard}>
+            Go to Dashboard
+          </button>
+        )}
       </header>
 
       <main className={styles.main}>
@@ -251,6 +215,14 @@ const LandingPage = () => {
                 {isAuthenticated ? 'Go to Dashboard' : 'View Demo'}
               </button>
             </div>
+            {!isAuthenticated && (
+              <p className={styles.signInPrompt}>
+                Already have an account?{' '}
+                <button type="button" onClick={() => setShowAuthModal('login')} className={styles.signInLink}>
+                  Sign in
+                </button>
+              </p>
+            )}
             <div className={styles.heroBenefits}>
               <div>
                 <CheckIcon />
@@ -400,8 +372,16 @@ const LandingPage = () => {
           <span>&copy; {new Date().getFullYear()} Fruit Vendor. All rights reserved.</span>
         </div>
       </footer>
+
+      {showAuthModal && (
+        <AuthModal
+          mode={showAuthModal}
+          onClose={() => setShowAuthModal(null)}
+          onSubmit={handleAuthSubmit}
+        />
+      )}
     </div>
->>>>>>> sean
+    </>
   )
 }
 

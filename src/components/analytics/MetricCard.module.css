@@ -1,25 +1,59 @@
 .card {
   background: #ffffff;
-  border-radius: 1.6rem;
+  border-radius: 1.5rem;
   border: 1px solid #e2e8f0;
-  box-shadow: 0 24px 48px rgba(15, 23, 42, 0.08);
-  padding: 1.6rem;
+  box-shadow: 0 1px 3px rgba(15, 23, 42, 0.08);
+  padding: 1.5rem;
   display: flex;
   flex-direction: column;
+  gap: 0.65rem;
+  transition: all 0.2s ease;
+}
+
+.card:hover {
+  box-shadow: 0 4px 12px rgba(15, 23, 42, 0.12);
+  transform: translateY(-1px);
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
   gap: 0.5rem;
 }
 
 .label {
   margin: 0;
-  font-size: 0.95rem;
+  font-size: 0.875rem;
   font-weight: 600;
-  color: #475569;
+  color: #64748b;
+  text-transform: uppercase;
+  letter-spacing: 0.025em;
+}
+
+.trend {
+  font-size: 0.75rem;
+  font-weight: 700;
+  padding: 0.2rem 0.5rem;
+  border-radius: 0.375rem;
+}
+
+.trendUp {
+  color: #047857;
+  background: #d1fae5;
+}
+
+.trendDown {
+  color: #dc2626;
+  background: #fee2e2;
 }
 
 .value {
   margin: 0;
-  font-size: 1.8rem;
+  font-size: 1.875rem;
   font-weight: 800;
+  letter-spacing: -0.02em;
+  line-height: 1.2;
 }
 
 .valueGreen {
@@ -27,12 +61,20 @@
 }
 
 .valueBlue {
-  color: #1d4ed8;
+  color: #1e40af;
+}
+
+.valueOrange {
+  color: #ea580c;
+}
+
+.valueRed {
+  color: #dc2626;
 }
 
 .helper {
   margin: 0;
-  font-size: 0.85rem;
-  font-weight: 600;
-  color: #64748b;
+  font-size: 0.8125rem;
+  font-weight: 500;
+  color: #94a3b8;
 }

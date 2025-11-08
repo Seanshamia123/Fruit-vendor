@@ -26,6 +26,7 @@ const InventoryPage = () => {
     error,
     inventoryItems: inventoryList,
     purchaseRecords: purchaseRecordsList,
+    purchaseCandidates: purchaseCandidatesList,
     handleSavePurchase: savePurchaseToApi,
   } = useInventoryData()
 
@@ -40,7 +41,7 @@ const InventoryPage = () => {
   const renderActiveView = () => {
     switch (activeView) {
       case 'new_purchase':
-        return <NewPurchase onSave={handleSavePurchase} />
+        return <NewPurchase onSave={handleSavePurchase} candidates={purchaseCandidatesList} />
       case 'product_management':
         return <ProductManagement items={inventoryList} />
       case 'overview':

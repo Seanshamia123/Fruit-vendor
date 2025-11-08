@@ -1,5 +1,5 @@
 # backend/app/models/vendor.py
-from sqlalchemy import Column, String, Integer, DateTime
+from sqlalchemy import Column, String, Integer, DateTime, Boolean
 from sqlalchemy.orm import relationship
 from app.database import Base
 from datetime import datetime
@@ -13,6 +13,7 @@ class Vendor(Base):
     contact = Column(String(20))
     location = Column(String(255), nullable=True)
     password_hash = Column(String(255), nullable=False)
+    onboarding_completed = Column(Boolean, default=False, nullable=False)
     created_at = Column(DateTime, default=datetime.utcnow)
 
     # relationships

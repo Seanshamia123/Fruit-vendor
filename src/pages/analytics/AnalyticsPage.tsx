@@ -5,10 +5,38 @@ import CategoryShareCard from '../../components/analytics/CategoryShareCard'
 import HourlyPatternCard from '../../components/analytics/HourlyPatternCard'
 import InsightsCard from '../../components/analytics/InsightsCard'
 import { exportSalesTrendCsv } from '../../utils/exportCsv'
+import { useAnalytics } from '../../hooks/useAnalytics'
 import styles from './AnalyticsPage.module.css'
-import { categoryShares, hourlyPattern, insights, metrics, salesPerformance } from './data'
 
 const AnalyticsPage = () => {
+  const {
+    isLoading,
+    error,
+    metrics,
+    salesPerformance,
+    categoryShares,
+    hourlyPattern,
+    insights,
+  } = useAnalytics()
+
+  if (isLoading) {
+    return (
+      <MainLayout title="Analytics" subtitle="Business insights and trends">
+        <div style={{ padding: '2rem', textAlign: 'center' }}>Loading analytics...</div>
+      </MainLayout>
+    )
+  }
+
+  if (error) {
+    return (
+      <MainLayout title="Analytics" subtitle="Business insights and trends">
+        <div style={{ padding: '2rem', textAlign: 'center', color: '#ef4444' }}>
+          Error loading analytics: {error}
+        </div>
+      </MainLayout>
+    )
+  }
+
   return (
     <MainLayout
       title="Analytics"

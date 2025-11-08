@@ -10,7 +10,10 @@ from dotenv import load_dotenv
 
 from app.database import SessionLocal
 from app.models.vendor import Vendor
+from app.models.vendor_preference import VendorPreference
 from app.schemas.vendor import VendorCreate, VendorOut
+from app.schemas.auth import AuthResponse
+from app.schemas.onboarding import OnboardingData
 from app.core.security import get_password_hash, create_access_token
 
 load_dotenv()
@@ -34,17 +37,24 @@ def register_vendor(vendor: VendorCreate, db: Session = Depends(get_db)):
     existing = db.query(Vendor).filter(Vendor.email == vendor.email).first()
     if existing:
         raise HTTPException(status_code=400, detail="Email already registered")
-    
+
     hashed_pw = get_password_hash(vendor.password)
     new_vendor = Vendor(
         name=vendor.name,
         email=vendor.email,
         contact=vendor.contact,
+        location=vendor.location,
         password_hash=hashed_pw
     )
     db.add(new_vendor)
     db.commit()
     db.refresh(new_vendor)
+
+    # Create default vendor preferences
+    default_preferences = VendorPreference(vendor_id=new_vendor.id)
+    db.add(default_preferences)
+    db.commit()
+
     return new_vendor
 
 # Add this for token-based vendor authentication
@@ -66,7 +76,7 @@ def get_current_vendor(token: str = Depends(oauth2_scheme), db: Session = Depend
     if vendor is None:
         raise credentials_exception
     return vendor
-@router.post("/login")
+@router.post("/login", response_model=AuthResponse)
 def login_vendor(form_data: OAuth2PasswordRequestForm = Depends(), db: Session = Depends(get_db)):
     vendor = db.query(Vendor).filter(Vendor.email == form_data.username).first()
     if not vendor or not verify_password(form_data.password, vendor.password_hash):
@@ -77,9 +87,46 @@ def login_vendor(form_data: OAuth2PasswordRequestForm = Depends(), db: Session =
         data={"sub": str(vendor.id)},
         expires_delta=access_token_expires
     )
-    return {"access_token": access_token, "token_type": "bearer"}
+    return {
+        "access_token": access_token,
+        "token_type": "bearer",
+        "vendor": vendor
+    }
 
 @router.get("/me", response_model=VendorOut)
 def get_current_vendor_info(current_vendor: Vendor = Depends(get_current_vendor)):
     """Get the currently authenticated vendor's information"""
+    return current_vendor
+
+@router.post("/complete-onboarding", response_model=VendorOut)
+def complete_onboarding(
+    onboarding_data: OnboardingData,
+    current_vendor: Vendor = Depends(get_current_vendor),
+    db: Session = Depends(get_db)
+):
+    """Save onboarding responses and mark onboarding as completed"""
+    # Update vendor preferences with onboarding data
+    preferences = db.query(VendorPreference).filter(
+        VendorPreference.vendor_id == current_vendor.id
+    ).first()
+
+    if not preferences:
+        # Create preferences if they don't exist
+        preferences = VendorPreference(vendor_id=current_vendor.id)
+        db.add(preferences)
+
+    # Update preferences with onboarding data
+    preferences.business_type = onboarding_data.business_type
+    preferences.products_of_interest = onboarding_data.products_of_interest
+    preferences.challenges = onboarding_data.challenges
+    preferences.goals = onboarding_data.goals
+    preferences.display_mode = onboarding_data.display_mode
+    preferences.language = onboarding_data.language
+
+    # Mark onboarding as completed
+    current_vendor.onboarding_completed = True
+
+    db.commit()
+    db.refresh(current_vendor)
+
     return current_vendor

@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom'
 import Button from '../../components/Button'
 import styles from './OnboardingWizard.module.css'
 import { useAuth } from '../../state/authContext'
+import { authApi } from '../../services/api'
 
 const BUSINESS_TYPES = ['retail', 'market', 'grocery', 'salon', 'home', 'other'] as const
 type BusinessType = (typeof BUSINESS_TYPES)[number]
@@ -127,9 +128,29 @@ const OnboardingWizard = () => {
     navigate('/dashboard', { replace: true })
   }
 
-  const handleFinish = () => {
-    markOnboardingStatus('completed')
-    navigate('/dashboard', { replace: true })
+  const handleFinish = async () => {
+    try {
+      // Save onboarding data to backend
+      if (businessType) {
+        await authApi.completeOnboarding({
+          business_type: businessType,
+          products_of_interest: products,
+          challenges: challenges,
+          goals: goals,
+          display_mode: display,
+          language: 'en', // Default to English for now
+        })
+      }
+
+      markOnboardingStatus('completed')
+      navigate('/dashboard', { replace: true })
+    } catch (error) {
+      console.error('Failed to save onboarding data:', error)
+      // Still navigate to dashboard even if saving fails
+      // The user can update their preferences in settings later
+      markOnboardingStatus('completed')
+      navigate('/dashboard', { replace: true })
+    }
   }
 
   const goNext = () => {

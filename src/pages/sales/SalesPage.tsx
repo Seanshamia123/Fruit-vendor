@@ -1,8 +1,9 @@
-import { useEffect, useMemo, useState, type ReactNode } from 'react'
+import { useEffect, useMemo, useState, type KeyboardEvent, type ReactNode } from 'react'
 import { useNavigate } from 'react-router-dom'
 import Button from '../../components/Button'
 import MainLayout from '../../layouts/MainLayout'
-import { initialInventory, initialSessions } from './data'
+import { initialSessions } from './data'
+import { useSalesData } from '../../hooks/useSalesData'
 import styles from './Sales.module.css'
 import type {
   CartLine,
@@ -147,7 +148,14 @@ const countItemsSold = (lines: SaleLine[]) =>
 
 const SalesPage = () => {
   const navigate = useNavigate()
-  const [inventory, setInventory] = useState(initialInventory)
+  const {
+    inventoryItems,
+    isLoading: isLoadingData,
+    error: dataError,
+    handleCompleteSale: backendCompleteSale,
+    refetch: refetchData,
+  } = useSalesData()
+  const [inventory, setInventory] = useState(inventoryItems)
   const [activeTab, setActiveTab] = useState<'quick' | 'manual' | 'multi'>('quick')
   const [quickCart, setQuickCart] = useState<CartRecord>({})
   const [manualCart, setManualCart] = useState<CartRecord>({})
@@ -163,6 +171,13 @@ const SalesPage = () => {
   const [mpesaPhoneError, setMpesaPhoneError] = useState<string | null>(null)
   const [quantityDrafts, setQuantityDrafts] = useState<Record<string, string>>({})
   const [priceDrafts, setPriceDrafts] = useState<Record<string, string>>({})
+
+  // Sync inventory when backend data loads
+  useEffect(() => {
+    if (inventoryItems.length > 0) {
+      setInventory(inventoryItems)
+    }
+  }, [inventoryItems])
 
   const inventoryMap = useMemo(
     () => new Map(inventory.map((item) => [item.id, item])),
@@ -573,7 +588,7 @@ const SalesPage = () => {
     })
   }
 
-  const handlePaymentSuccess = (flow: PaymentFlow) => {
+  const handlePaymentSuccess = async (flow: PaymentFlow) => {
     if (!flow.method) return
 
     const saleDetail = computeSaleDetail(flow)
@@ -582,6 +597,16 @@ const SalesPage = () => {
     const cart = getSaleCart(flow)
     if (!cart) return
 
+    // Call backend API to complete the sale
+    const success = await backendCompleteSale(cart, flow.method)
+
+    if (!success) {
+      // If backend fails, show error
+      handlePaymentFailure(flow, 'ERR_BACKEND_FAILED')
+      return
+    }
+
+    // Update local inventory optimistically (will be synced from backend on refetch)
     setInventory((prev) =>
       prev.map((item) => {
         const line = cart[item.id]
@@ -611,6 +636,9 @@ const SalesPage = () => {
     setLastSale(saleDetail)
     setPaymentFlow({ ...flow, stage: 'success' })
     setProcessingStep(0)
+
+    // Refresh inventory from backend to ensure sync
+    refetchData()
   }
 
   const handlePaymentFailure = (flow: PaymentFlow, errorCode: string) => {
@@ -913,10 +941,32 @@ const SalesPage = () => {
     </div>
   )
 
-  const renderInventoryCard = (item: InventoryItem, actionLabel = 'Tap to add', onAction?: () => void, footer?: ReactNode) => {
+  const renderInventoryCard = (item: InventoryItem, onSelect?: () => void, footer?: ReactNode) => {
     const isOut = item.stock <= 0 || item.status === 'out-of-stock'
+    const clickable = Boolean(onSelect) && !isOut
+
+    const cardClasses = [styles.itemCard]
+    if (clickable) cardClasses.push(styles.itemCardInteractive)
+    if (isOut) cardClasses.push(styles.itemCardDisabled)
+
+    const handleKeyDown = (event: KeyboardEvent<HTMLDivElement>) => {
+      if (!clickable) return
+      if (event.key === 'Enter' || event.key === ' ') {
+        event.preventDefault()
+        onSelect?.()
+      }
+    }
+
     return (
-      <div key={item.id} className={styles.itemCard}>
+      <div
+        key={item.id}
+        className={cardClasses.join(' ')}
+        role={clickable ? 'button' : undefined}
+        tabIndex={clickable ? 0 : undefined}
+        onClick={clickable ? () => onSelect?.() : undefined}
+        onKeyDown={handleKeyDown}
+        aria-disabled={isOut}
+      >
         <div className={styles.itemHeader}>
           <span className={styles.itemName}>{item.name}</span>
           <span className={styles.itemStock}>{formatStockLabel(item.stock, item.unit)}</span>
@@ -924,13 +974,7 @@ const SalesPage = () => {
         <div className={styles.itemPrice}>
           {formatCurrency(item.pricePerUnit)}/{item.unit === 'pieces' ? 'piece' : 'item'}
         </div>
-        {isOut ? (
-          <span className={styles.outOfStockLabel}>Unavailable</span>
-        ) : (
-          <button type="button" className={`${styles.itemAction} ${styles.itemActionButton}`} onClick={onAction}>
-            {actionLabel}
-          </button>
-        )}
+        {isOut && <span className={styles.outOfStockLabel}>Unavailable</span>}
         {item.status === 'out-of-stock' && <span className={styles.outOfStockBadge}>Out of Stock</span>}
         {footer}
       </div>
@@ -1050,9 +1094,7 @@ const SalesPage = () => {
         )
       ) : (
         <div className={styles.inventoryGrid}>
-          {inventory.map((item) =>
-            renderInventoryCard(item, 'Tap to add', () => handleQuickAdd(item.id))
-          )}
+          {inventory.map((item) => renderInventoryCard(item, () => handleQuickAdd(item.id)))}
         </div>
       )}
 
@@ -1085,12 +1127,12 @@ const SalesPage = () => {
           {inventory.map((item) => {
             const isEditing = manualEditingId === item.id
             const draft = manualDrafts[item.id]
-            return renderInventoryCard(
-              item,
-              'Tap to configure',
-              () => handleManualToggle(item.id),
-              isEditing && draft ? (
-                <div className={styles.manualConfigCard}>
+            return renderInventoryCard(item, () => handleManualToggle(item.id), isEditing && draft ? (
+                <div
+                  className={styles.manualConfigCard}
+                  onClick={(event) => event.stopPropagation()}
+                  onKeyDown={(event) => event.stopPropagation()}
+                >
                   <div className={styles.manualFields}>
                     <label className={styles.manualField}>
                       <span className={styles.manualLabel}>Items sold</span>
@@ -1117,8 +1159,7 @@ const SalesPage = () => {
                     Add to Cart
                   </button>
                 </div>
-              ) : undefined
-            )
+              ) : undefined)
           })}
         </div>
       )}
@@ -1201,7 +1242,11 @@ const SalesPage = () => {
               {inventory.map((item) => {
                 const line = activeSession.items[item.id]
                 const footer = line ? (
-                    <div className={styles.quantityControl}>
+                    <div
+                      className={styles.quantityControl}
+                      onClick={(event) => event.stopPropagation()}
+                      onKeyDown={(event) => event.stopPropagation()}
+                    >
                       <button type="button" className={styles.quantityButton} onClick={() => handleSessionItemRemove(activeSession.id, item.id)}>
                         −
                       </button>
@@ -1212,12 +1257,7 @@ const SalesPage = () => {
                     </div>
                 ) : undefined
 
-                return renderInventoryCard(
-                  item,
-                  line ? 'Adjust quantity' : 'Tap to add',
-                  () => handleSessionItemAdd(activeSession.id, item.id),
-                  footer
-                )
+                return renderInventoryCard(item, () => handleSessionItemAdd(activeSession.id, item.id), footer)
               })}
             </div>
           )}
@@ -1711,6 +1751,24 @@ const SalesPage = () => {
     if (activeTab === 'quick') return renderQuickSell()
     if (activeTab === 'manual') return renderManualSale()
     return renderMultiCart()
+  }
+
+  if (isLoadingData) {
+    return (
+      <MainLayout title="Sales" subtitle="Sell items, process payments, and update stock">
+        <div style={{ padding: '2rem', textAlign: 'center' }}>Loading sales data...</div>
+      </MainLayout>
+    )
+  }
+
+  if (dataError) {
+    return (
+      <MainLayout title="Sales" subtitle="Sell items, process payments, and update stock">
+        <div style={{ padding: '2rem', textAlign: 'center', color: '#ef4444' }}>
+          Error loading sales data: {dataError}
+        </div>
+      </MainLayout>
+    )
   }
 
   return (

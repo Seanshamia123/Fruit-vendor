@@ -3,11 +3,8 @@ import Button from '../../components/Button'
 import MainLayout from '../../layouts/MainLayout'
 import SectionTabs from '../../components/priceManagement/SectionTabs'
 import styles from './RewardRules.module.css'
-import {
-  rewardRules,
-  rewardSummaryMetrics,
-  rewardTips,
-} from './data'
+import { rewardTips } from './data'
+import { usePriceManagement } from '../../hooks/usePriceManagement'
 
 type RewardRulesViewProps = {
   editing?: boolean
@@ -15,6 +12,15 @@ type RewardRulesViewProps = {
 
 const RewardRulesView = ({ editing = false }: RewardRulesViewProps) => {
   const navigate = useNavigate()
+  const {
+    isLoading,
+    error,
+    rewardRules,
+    rewardSummaryMetrics,
+    handleToggleBonusRule,
+    handleDeleteBonusRule,
+  } = usePriceManagement()
+
   const hasRules = rewardRules.length > 0
   const editingRule = rewardRules.find((rule) => rule.status === 'active') ?? rewardRules[0] ?? null
 
@@ -31,6 +37,30 @@ const RewardRulesView = ({ editing = false }: RewardRulesViewProps) => {
   ]
 
   const showEditorPlaceholder = editing && !editingRule
+
+  if (isLoading) {
+    return (
+      <MainLayout
+        title="Reward Rules"
+        subtitle="Create and manage automated rewards"
+      >
+        <div style={{ padding: '2rem', textAlign: 'center' }}>Loading reward rules...</div>
+      </MainLayout>
+    )
+  }
+
+  if (error) {
+    return (
+      <MainLayout
+        title="Reward Rules"
+        subtitle="Create and manage automated rewards"
+      >
+        <div style={{ padding: '2rem', textAlign: 'center', color: '#ef4444' }}>
+          Error loading reward rules: {error}
+        </div>
+      </MainLayout>
+    )
+  }
 
   return (
     <MainLayout
@@ -197,6 +227,13 @@ const RewardRulesView = ({ editing = false }: RewardRulesViewProps) => {
                   <button
                     type="button"
                     className={`${styles.toggleButton} ${rule.status === 'inactive' ? styles.toggleButtonInactive : ''}`}
+                    onClick={async () => {
+                      try {
+                        await handleToggleBonusRule(Number(rule.id), rule.status === 'inactive')
+                      } catch (err) {
+                        console.error('Failed to toggle rule:', err)
+                      }
+                    }}
                   >
                     {rule.status === 'active' ? 'Turn off' : 'Turn on'}
                   </button>
@@ -217,7 +254,20 @@ const RewardRulesView = ({ editing = false }: RewardRulesViewProps) => {
                       <path d="M4 16V6a2 2 0 0 1 2-2h10" />
                     </svg>
                   </button>
-                  <button type="button" className={styles.iconButton} aria-label="Delete rule">
+                  <button
+                    type="button"
+                    className={styles.iconButton}
+                    aria-label="Delete rule"
+                    onClick={async () => {
+                      if (window.confirm(`Are you sure you want to delete "${rule.name}"?`)) {
+                        try {
+                          await handleDeleteBonusRule(Number(rule.id))
+                        } catch (err) {
+                          console.error('Failed to delete rule:', err)
+                        }
+                      }
+                    }}
+                  >
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" width="18" height="18" aria-hidden>
                       <path d="M3 6h18" />
                       <path d="M8 6V4h8v2" />

@@ -1,12 +1,18 @@
 .card {
   background: #ffffff;
   border: 1px solid #e2e8f0;
-  border-radius: 1.75rem;
-  box-shadow: 0 24px 48px rgba(15, 23, 42, 0.08);
-  padding: 1.6rem;
+  border-radius: 1.5rem;
+  box-shadow: 0 1px 3px rgba(15, 23, 42, 0.08);
+  padding: 1.5rem;
   display: flex;
   flex-direction: column;
-  gap: 1.2rem;
+  gap: 1.25rem;
+  height: fit-content;
+  transition: box-shadow 0.2s ease;
+}
+
+.card:hover {
+  box-shadow: 0 4px 12px rgba(15, 23, 42, 0.12);
 }
 
 .title {
@@ -16,12 +22,93 @@
   color: #0f172a;
 }
 
-.chart {
-  width: 100%;
-  height: auto;
+.badgeRow {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  font-size: 0.85rem;
+  color: #475569;
+  flex-wrap: wrap;
 }
 
-.axisLabel {
-  fill: #94a3b8;
-  font-size: 11px;
+.badgeRow strong {
+  color: #0f172a;
+}
+
+.chartShell {
+  margin-top: 0.5rem;
+  padding-bottom: 1.5rem;
+  position: relative;
+  overflow: hidden;
+}
+
+.barGrid {
+  display: flex;
+  align-items: flex-end;
+  gap: 0.85rem;
+  height: 190px;
+  padding: 0.5rem 0.4rem 1.2rem;
+  width: 100%;
+  overflow: hidden;
+}
+
+.bar {
+  flex: 1 1 0;
+  min-width: 0;
+  border: none;
+  border-radius: 1rem 1rem 0.75rem 0.75rem;
+  position: relative;
+  cursor: pointer;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  background: #e0f2fe;
+}
+
+.bar:focus-visible {
+  outline: 2px solid #2563eb;
+  outline-offset: 2px;
+}
+
+.barActive {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 30px rgba(15, 23, 42, 0.18);
+}
+
+.barLabel {
+  position: absolute;
+  bottom: -1.5rem;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 0.75rem;
+  color: #475569;
+  font-weight: 600;
+}
+
+.activeSummary {
+  margin-top: 2rem;
+  background: #f8fafc;
+  border-radius: 1rem;
+  padding: 1rem 1.25rem;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  gap: 0.75rem;
+}
+
+.summaryLabel {
+  display: block;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  color: #94a3b8;
+  letter-spacing: 0.08em;
+  margin-bottom: 0.2rem;
+}
+
+.activeSummary strong {
+  font-size: 1rem;
+  color: #0f172a;
+}
+
+@media (max-width: 640px) {
+  .barGrid {
+    gap: 0.5rem;
+  }
 }

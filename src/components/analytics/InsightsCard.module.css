@@ -1,19 +1,24 @@
 .card {
-  background: #f5f9ff;
-  border: 1px solid #bfdbfe;
-  border-radius: 1.75rem;
-  box-shadow: 0 22px 48px rgba(59, 130, 246, 0.16);
-  padding: 1.75rem;
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 1.5rem;
+  box-shadow: 0 1px 3px rgba(15, 23, 42, 0.08);
+  padding: 1.5rem;
   display: flex;
   flex-direction: column;
-  gap: 1.2rem;
+  gap: 1.25rem;
+  transition: box-shadow 0.2s ease;
+}
+
+.card:hover {
+  box-shadow: 0 4px 12px rgba(15, 23, 42, 0.12);
 }
 
 .title {
   margin: 0;
   font-size: 1.1rem;
   font-weight: 700;
-  color: #1d4ed8;
+  color: #0f172a;
 }
 
 .list {
@@ -27,36 +32,46 @@
 
 .listItem {
   display: flex;
-  gap: 0.75rem;
+  gap: 0.875rem;
+  padding: 0.75rem;
+  border-radius: 0.75rem;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
 }
 
 .dot {
-  width: 10px;
-  height: 10px;
+  width: 8px;
+  height: 8px;
   border-radius: 999px;
-  margin-top: 0.3rem;
+  margin-top: 0.4rem;
+  flex-shrink: 0;
 }
 
 .dotInfo {
-  background: #2563eb;
+  background: #3b82f6;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
 }
 
 .dotSuccess {
   background: #10b981;
+  box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.15);
 }
 
 .dotAlert {
   background: #f97316;
+  box-shadow: 0 0 0 3px rgba(249, 115, 22, 0.15);
 }
 
 .insightTitle {
   margin: 0;
   font-weight: 700;
+  font-size: 0.9375rem;
   color: #0f172a;
 }
 
 .insightDetail {
-  margin: 0.2rem 0 0;
-  color: #475569;
-  font-size: 0.9rem;
+  margin: 0.3rem 0 0;
+  color: #64748b;
+  font-size: 0.875rem;
+  line-height: 1.5;
 }
