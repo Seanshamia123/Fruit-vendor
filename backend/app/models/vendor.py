@@ -24,6 +24,7 @@ class Vendor(Base):
     mpesa_transactions = relationship("MpesaTransaction", back_populates="vendor", cascade="all, delete-orphan")
     spoilage_entries = relationship("SpoilageEntry", back_populates="vendor", cascade="all, delete-orphan")
     carts = relationship("Cart", back_populates="vendor", cascade="all, delete-orphan")
+    bonus_rules = relationship("BonusRule", back_populates="vendor", cascade="all, delete-orphan")
 
     preferences = relationship(
         "VendorPreference",

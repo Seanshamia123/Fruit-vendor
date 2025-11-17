@@ -223,6 +223,50 @@ export const usePriceManagement = () => {
     [fetchData]
   )
 
+  const handleCreateBonusRule = useCallback(
+    async (data: {
+      rule_name: string
+      condition_type: string
+      condition_value: number
+      bonus_type: string
+      bonus_value: number
+      is_active?: boolean
+    }) => {
+      try {
+        await bonusRuleApi.create(data)
+        // Don't clear global error here - let fetchData handle its own errors
+        await fetchData()
+      } catch (err) {
+        console.error('Failed to create bonus rule:', err)
+        // Don't set global error for save operations - let the form handle it
+        throw err
+      }
+    },
+    [fetchData]
+  )
+
+  const handleUpdateBonusRule = useCallback(
+    async (ruleId: number, data: Partial<{
+      rule_name: string
+      condition_type: string
+      condition_value: number
+      bonus_type: string
+      bonus_value: number
+      is_active: boolean
+    }>) => {
+      try {
+        await bonusRuleApi.update(ruleId, data)
+        // Don't clear global error here - let fetchData handle its own errors
+        await fetchData()
+      } catch (err) {
+        console.error('Failed to update bonus rule:', err)
+        // Don't set global error for save operations - let the form handle it
+        throw err
+      }
+    },
+    [fetchData]
+  )
+
   return {
     isLoading,
     error,
@@ -234,6 +278,8 @@ export const usePriceManagement = () => {
     productPricings,
     handleToggleBonusRule,
     handleDeleteBonusRule,
+    handleCreateBonusRule,
+    handleUpdateBonusRule,
     refetch: fetchData,
   }
 }

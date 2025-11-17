@@ -16,8 +16,12 @@ def get_db():
         db.close()
 
 @router.post("/", response_model=BonusRuleOut)
-def create_bonus_rule(rule: BonusRuleCreate, db: Session = Depends(get_db)):
-    return bonus_rule_service.create_bonus_rule(db, rule)
+def create_bonus_rule(
+    rule: BonusRuleCreate,
+    current_vendor: Vendor = Depends(get_current_vendor),
+    db: Session = Depends(get_db)
+):
+    return bonus_rule_service.create_bonus_rule(db, rule, current_vendor.id)
 
 @router.get("/", response_model=list[BonusRuleOut])
 def list_all_bonus_rules(
@@ -45,8 +49,13 @@ def toggle_bonus_rule(
     return bonus_rule_service.toggle_bonus_rule(db, rule_id, current_vendor.id)
 
 @router.put("/{rule_id}", response_model=BonusRuleOut)
-def update_bonus_rule(rule_id: int, rule: BonusRuleUpdate, db: Session = Depends(get_db)):
-    return bonus_rule_service.update_bonus_rule(db, rule_id, rule)
+def update_bonus_rule(
+    rule_id: int,
+    rule: BonusRuleUpdate,
+    current_vendor: Vendor = Depends(get_current_vendor),
+    db: Session = Depends(get_db)
+):
+    return bonus_rule_service.update_bonus_rule(db, rule_id, rule, current_vendor.id)
 
 @router.delete("/{rule_id}")
 def delete_bonus_rule(

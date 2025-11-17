@@ -1,16 +1,19 @@
-from sqlalchemy import Column, Integer, Float, String, ForeignKey, Boolean
+from sqlalchemy import Column, Integer, Float, String, ForeignKey, Boolean, DateTime
 from sqlalchemy.orm import relationship
+from datetime import datetime
 from app.database import Base
 
 class BonusRule(Base):
     __tablename__ = "bonus_rules"
 
     id = Column(Integer, primary_key=True, index=True)
-    product_id = Column(Integer, ForeignKey("products.id"), nullable=False)
-    rule_type = Column(String(50), nullable=False)      # e.g., "buy_x_get_y", "discount"
-    threshold_qty = Column(Float, nullable=False)
-    bonus_qty = Column(Float, nullable=True)
-    bonus_discount = Column(Float, nullable=True)
+    vendor_id = Column(Integer, ForeignKey("vendors.id"), nullable=False)
+    rule_name = Column(String(200), nullable=False)
+    condition_type = Column(String(50), nullable=False)  # e.g., "sales_value", "quantity", "visit_frequency"
+    condition_value = Column(Float, nullable=False)
+    bonus_type = Column(String(50), nullable=False)  # e.g., "percentage", "fixed", "free_item"
+    bonus_value = Column(Float, nullable=False)
     is_active = Column(Boolean, default=True, nullable=False)
+    created_at = Column(DateTime, default=datetime.utcnow, nullable=False)
 
-    product = relationship("Product", back_populates="bonus_rules")
+    vendor = relationship("Vendor", back_populates="bonus_rules")
