@@ -1,32 +1,6 @@
-export type PriceMetric = {
-  id: string
-  label: string
-  value: string
-  description: string
-}
-
-export type ProductPrice = {
-  id: string
-  name: string
-  variety?: string
-  pricingMode: string
-  currentPrice: string
-  purchasePrice: string
-  marginPercent: string
-  lastUpdated: string
-  tags?: string[]
-}
-
 export type PricingTip = {
   id: string
   title: string
-  description: string
-}
-
-export type StrategyMetric = {
-  id: string
-  label: string
-  value: string
   description: string
 }
 
@@ -36,6 +10,13 @@ export type PricingPlan = {
   description: string
   example: string
   icon: 'unit' | 'bulk' | 'time'
+}
+
+export type StrategyMetric = {
+  id: string
+  label: string
+  value: string
+  description: string
 }
 
 export type ProductStrategy = {
@@ -48,25 +29,6 @@ export type ProductStrategy = {
   highlight?: boolean
   schedule?: { label: string; value: string }[]
 }
-
-export type RewardRule = {
-  id: string
-  name: string
-  status: 'active' | 'inactive'
-  condition: string
-  reward: string
-  createdOn: string
-  appliedCount: number
-  iconLabel: string
-}
-
-export const priceMetrics: PriceMetric[] = [
-  { id: 'average-price', value: '--', label: 'Average Price', description: 'No prices recorded yet' },
-  { id: 'average-margin', value: '--', label: 'Average Margin', description: 'Set a selling price to see margins' },
-  { id: 'price-dips', value: '0', label: 'Prices Below Target', description: 'You have no price alerts yet' },
-]
-
-export const productPrices: ProductPrice[] = []
 
 export const pricingTips: PricingTip[] = [
   {
@@ -83,27 +45,6 @@ export const pricingTips: PricingTip[] = [
     id: 'use-history',
     title: 'Lean on history',
     description: 'Compare today\'s prices with last month to spot trends early.',
-  },
-]
-
-export const strategyMetrics: StrategyMetric[] = [
-  {
-    id: 'per-piece',
-    label: 'Per Item',
-    value: '--',
-    description: 'No pricing plans created yet',
-  },
-  {
-    id: 'bulk',
-    label: 'By Measure',
-    value: '--',
-    description: 'Create bulk pricing to unlock discounts',
-  },
-  {
-    id: 'time-based',
-    label: 'Time-Based',
-    value: '--',
-    description: 'Schedule a price to see activity here',
   },
 ]
 
@@ -131,8 +72,6 @@ export const pricingPlans: PricingPlan[] = [
   },
 ]
 
-export const productStrategies: ProductStrategy[] = []
-
 export const bestPractices: PricingTip[] = [
   {
     id: 'per-item',
@@ -151,28 +90,28 @@ export const bestPractices: PricingTip[] = [
   },
 ]
 
-export const rewardSummaryMetrics: PriceMetric[] = [
+export const strategyMetrics: StrategyMetric[] = [
   {
-    id: 'active-rules',
-    value: '0',
-    label: 'Active Rules',
-    description: 'You have not created any reward rules yet',
+    id: 'per-piece',
+    label: 'Per Item',
+    value: '--',
+    description: 'No pricing plans created yet',
   },
   {
-    id: 'times-used',
-    value: '0',
-    label: 'Times Applied',
-    description: 'Activity appears after your first reward',
+    id: 'bulk',
+    label: 'By Measure',
+    value: '--',
+    description: 'Create bulk pricing to unlock discounts',
   },
   {
-    id: 'total-rules',
-    value: '0',
-    label: 'Total Rules',
-    description: 'Build rules to see progress here',
+    id: 'time-based',
+    label: 'Time-Based',
+    value: '--',
+    description: 'Schedule a price to see activity here',
   },
 ]
 
-export const rewardRules: RewardRule[] = []
+export const productStrategies: ProductStrategy[] = []
 
 export const rewardTips: PricingTip[] = [
   {

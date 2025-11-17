@@ -2,7 +2,6 @@ import { useEffect, useMemo, useState, type KeyboardEvent, type ReactNode } from
 import { useNavigate } from 'react-router-dom'
 import Button from '../../components/Button'
 import MainLayout from '../../layouts/MainLayout'
-import { initialSessions } from './data'
 import { useSalesData } from '../../hooks/useSalesData'
 import styles from './Sales.module.css'
 import type {
@@ -161,8 +160,8 @@ const SalesPage = () => {
   const [manualCart, setManualCart] = useState<CartRecord>({})
   const [manualDrafts, setManualDrafts] = useState<Record<string, ManualDraft>>({})
   const [manualEditingId, setManualEditingId] = useState<string | null>(null)
-  const [sessions, setSessions] = useState<CustomerSession[]>(initialSessions)
-  const [activeSessionId, setActiveSessionId] = useState(initialSessions[0]?.id ?? '')
+  const [sessions, setSessions] = useState<CustomerSession[]>([])
+  const [activeSessionId, setActiveSessionId] = useState('')
   const [paymentFlow, setPaymentFlow] = useState<PaymentFlow | null>(null)
   const [processingStep, setProcessingStep] = useState(1)
   const [processingSeconds, setProcessingSeconds] = useState(0)

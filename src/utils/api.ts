@@ -46,7 +46,16 @@ export const apiFetch = async <T>(path: string, init: ApiRequestInit = {}): Prom
     let message = response.statusText
     try {
       const data = await response.json()
-      message = data.detail ?? data.message ?? message
+      // Handle FastAPI validation errors (array format)
+      if (Array.isArray(data.detail)) {
+        message = data.detail.map((err: any) => err.msg || JSON.stringify(err)).join(', ')
+      } else if (typeof data.detail === 'string') {
+        message = data.detail
+      } else if (typeof data.detail === 'object') {
+        message = JSON.stringify(data.detail)
+      } else {
+        message = data.message ?? message
+      }
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     } catch (err) {
       // ignore JSON parsing errors

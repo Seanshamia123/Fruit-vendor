@@ -148,10 +148,10 @@ export type VendorPreference = {
   id: number
   vendor_id: number
   // Display preferences
-  dashboard_metrics?: Record<string, any>
+  dashboard_metrics?: Record<string, unknown>
   color_theme?: string
   display_mode?: string
-  display_options?: Record<string, any>
+  display_options?: Record<string, unknown>
   language?: string
   // Alert settings
   alert_low_stock?: boolean
@@ -174,9 +174,6 @@ export type VendorPreference = {
 }
 
 export type VendorPreferenceUpdate = Partial<Omit<VendorPreference, 'id' | 'vendor_id'>>
-
-// Server infers the vendor from the auth token, so create payload matches update
-export type VendorPreferenceCreate = VendorPreferenceUpdate
 
 // Cart Types
 export type Cart = {

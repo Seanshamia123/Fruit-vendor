@@ -19,7 +19,6 @@ import type {
   SpoilageEntry,
   SpoilageEntryCreate,
   VendorPreference,
-  VendorPreferenceCreate,
   VendorPreferenceUpdate,
   Cart,
   CartItem,
@@ -177,30 +176,6 @@ export const spoilageApi = {
 
   delete: (id: number) =>
     apiFetch<void>(`/spoilage-entries/${id}`, {
-      method: 'DELETE',
-    }),
-}
-
-// ==================== VENDOR PREFERENCE API ====================
-export const vendorPreferenceApi = {
-  list: () => apiFetch<VendorPreference[]>('/vendor-preferences/'),
-
-  get: (key: string) => apiFetch<VendorPreference>(`/vendor-preferences/${key}`),
-
-  create: (data: VendorPreferenceCreate) =>
-    apiFetch<VendorPreference>('/vendor-preferences/', {
-      method: 'POST',
-      body: JSON.stringify(data),
-    }),
-
-  update: (key: string, value: string) =>
-    apiFetch<VendorPreference>(`/vendor-preferences/${key}`, {
-      method: 'PUT',
-      body: JSON.stringify({ preference_value: value }),
-    }),
-
-  delete: (key: string) =>
-    apiFetch<void>(`/vendor-preferences/${key}`, {
       method: 'DELETE',
     }),
 }

@@ -1,54 +1,32 @@
 {
-<<<<<<< HEAD
   "name": "fruit-vendor",
-=======
-  "name": "fruit",
->>>>>>> d9d4693c2aed1759119bea1c1ef8470842d8cd81
   "private": true,
   "version": "0.0.0",
   "type": "module",
   "scripts": {
     "dev": "vite",
-<<<<<<< HEAD
     "build": "tsc -b && vite build",
-=======
-    "build": "vite build",
->>>>>>> d9d4693c2aed1759119bea1c1ef8470842d8cd81
     "lint": "eslint .",
     "preview": "vite preview"
   },
   "dependencies": {
-<<<<<<< HEAD
     "@tailwindcss/vite": "^4.1.11",
     "react": "^19.1.1",
     "react-dom": "^19.1.1",
     "react-router-dom": "^7.6.3",
     "tailwindcss": "^4.1.11"
-=======
-    "react": "^19.1.0",
-    "react-dom": "^19.1.0"
->>>>>>> d9d4693c2aed1759119bea1c1ef8470842d8cd81
   },
   "devDependencies": {
     "@eslint/js": "^9.30.1",
     "@types/react": "^19.1.8",
     "@types/react-dom": "^19.1.6",
     "@vitejs/plugin-react": "^4.6.0",
-<<<<<<< HEAD
-=======
-    "autoprefixer": "^10.4.21",
->>>>>>> d9d4693c2aed1759119bea1c1ef8470842d8cd81
     "eslint": "^9.30.1",
     "eslint-plugin-react-hooks": "^5.2.0",
     "eslint-plugin-react-refresh": "^0.4.20",
     "globals": "^16.3.0",
-<<<<<<< HEAD
     "typescript": "~5.8.3",
     "typescript-eslint": "^8.35.1",
-=======
-    "postcss": "^8.5.6",
-    "tailwindcss": "^4.1.11",
->>>>>>> d9d4693c2aed1759119bea1c1ef8470842d8cd81
     "vite": "^7.0.4"
   }
 }

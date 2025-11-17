@@ -145,7 +145,17 @@ const App = () => {
           }
         />
         <Route
-          path="/price-management/rewards/edit"
+          path="/price-management/rewards/new"
+          element={
+            <RequireAuth>
+              <RequireOnboardingComplete>
+                <RewardRuleEditorPage />
+              </RequireOnboardingComplete>
+            </RequireAuth>
+          }
+        />
+        <Route
+          path="/price-management/rewards/edit/:id"
           element={
             <RequireAuth>
               <RequireOnboardingComplete>

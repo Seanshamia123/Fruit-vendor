@@ -29,11 +29,5 @@ class Product(Base):
         cascade="all, delete-orphan"
     )
 
-    bonus_rules = relationship(
-        "BonusRule",
-        back_populates="product",
-        cascade="all, delete-orphan"
-    )
-
     def __repr__(self):
         return f"<Product(name={self.name}, vendor_id={self.vendor_id})>"
