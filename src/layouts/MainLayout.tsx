@@ -20,7 +20,7 @@ const MainLayout = ({ title, subtitle, trailing, children }: MainLayoutProps) =>
   const navigate = useNavigate()
   const device = useDevice()
   const showDrawer = device !== 'mobile'
-  const { signOut } = useAuth()
+  const { signOut, vendor } = useAuth()
   const avatarTriggerRef = useRef<HTMLButtonElement | null>(null)
   const avatarMenuRef = useRef<HTMLDivElement | null>(null)
 
@@ -33,6 +33,17 @@ const MainLayout = ({ title, subtitle, trailing, children }: MainLayoutProps) =>
     () => (menuOpen ? 'Close navigation menu' : 'Open navigation menu'),
     [menuOpen]
   )
+
+  // ✅ Generate user initials from vendor name
+  const userInitials = useMemo(() => {
+    if (!vendor?.name) return 'FV'
+    return vendor.name
+      .split(' ')
+      .map((word) => word[0])
+      .join('')
+      .toUpperCase()
+      .slice(0, 2)
+  }, [vendor?.name])
 
   useEffect(() => {
     if (!avatarMenuOpen) return
@@ -100,8 +111,9 @@ const MainLayout = ({ title, subtitle, trailing, children }: MainLayoutProps) =>
                   aria-controls="avatar-menu"
                   onClick={() => setAvatarMenuOpen((prev) => !prev)}
                   className={styles.avatarTrigger}
+                  title={vendor ? `${vendor.name} (${vendor.email})` : 'User menu'}
                 >
-                  <span className={styles.avatarFallback}>FV</span>
+                  <span className={styles.avatarFallback}>{userInitials}</span>
                   <svg
                     className={styles.avatarChevron}
                     viewBox="0 0 24 24"
@@ -122,6 +134,20 @@ const MainLayout = ({ title, subtitle, trailing, children }: MainLayoutProps) =>
                   ref={avatarMenuRef}
                   className={`${styles.avatarDropdown} ${avatarMenuOpen ? styles.avatarDropdownOpen : ''}`}
                 >
+                  {/* ✅ Show user info header */}
+                  {vendor && (
+                    <>
+                      <div className={styles.avatarMenuHeader}>
+                        <div className={styles.avatarMenuAvatar}>{userInitials}</div>
+                        <div className={styles.avatarMenuInfo}>
+                          <div className={styles.avatarMenuName}>{vendor.name}</div>
+                          <div className={styles.avatarMenuEmail}>{vendor.email}</div>
+                        </div>
+                      </div>
+                      <div className={styles.avatarMenuDivider} />
+                    </>
+                  )}
+
                   <button type="button" role="menuitem" className={styles.avatarMenuItem} onClick={goToSettings}>
                     Settings
                   </button>

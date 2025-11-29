@@ -1,7 +1,7 @@
 import { useMemo, useState, useEffect, type ReactNode, useCallback } from 'react'
 import { AuthContext, type OnboardingStatus } from './authContext'
 import { loadOnboarding, clearOnboarding } from '../utils/storage'
-import { authApi } from '../services/api'
+import { authApi, vendorApi } from '../services/api'
 import type { VendorOut, LoginCredentials, VendorCreate } from '../services/types'
 
 type AuthProviderProps = {
@@ -67,10 +67,47 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
     const persisted = loadOnboarding()
     return persisted?.status ?? 'pending'
   })
+  const [isInitializing, setIsInitializing] = useState(true)
 
+  // ✅ CRITICAL: Verify token and sync onboarding status on app load
   useEffect(() => {
-    persistAuthToStorage(isAuthenticated, vendor)
-  }, [isAuthenticated, vendor])
+    const verifyAndInitialize = async () => {
+      const token = window.localStorage.getItem(TOKEN_KEY)
+      
+      if (!token) {
+        setIsAuthenticated(false)
+        setVendor(null)
+        setOnboardingStatus('pending')
+        setIsInitializing(false)
+        return
+      }
+
+      try {
+        // Fetch current vendor to verify token is valid AND get real onboarding status
+        const currentVendor = await vendorApi.getCurrent()
+        
+        setVendor(currentVendor)
+        setIsAuthenticated(true)
+        
+        // ✅ KEY FIX: Use backend's onboarding_completed, not localStorage
+        const status: OnboardingStatus = currentVendor.onboarding_completed ? 'completed' : 'pending'
+        setOnboardingStatus(status)
+        persistAuthToStorage(true, currentVendor)
+      } catch (error) {
+        console.warn('Token verification failed:', error)
+        // Token is invalid, expired, or network error
+        clearToken()
+        setIsAuthenticated(false)
+        setVendor(null)
+        setOnboardingStatus('pending')
+        persistAuthToStorage(false, null)
+      } finally {
+        setIsInitializing(false)
+      }
+    }
+
+    verifyAndInitialize()
+  }, [])
 
   const signIn = useCallback(async (credentials: LoginCredentials): Promise<OnboardingStatus> => {
     try {
@@ -81,9 +118,11 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
       setVendor(authResponse.vendor)
       setIsAuthenticated(true)
 
-      // Check onboarding status from the backend
+      // ✅ Check onboarding status from the backend response
       const status: OnboardingStatus = authResponse.vendor.onboarding_completed ? 'completed' : 'pending'
       setOnboardingStatus(status)
+      persistAuthToStorage(true, authResponse.vendor)
+      
       return status
     } catch (error) {
       console.error('Login failed:', error)
@@ -108,6 +147,8 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
       clearOnboarding()
       // New users should always have onboarding_completed = false
       setOnboardingStatus('pending')
+      persistAuthToStorage(true, authResponse.vendor)
+      
       return 'pending'
     } catch (error) {
       console.error('Registration failed:', error)
@@ -130,6 +171,11 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
     () => ({ isAuthenticated, vendor, onboardingStatus, signIn, signUp, signOut, markOnboardingStatus }),
     [isAuthenticated, vendor, onboardingStatus, signIn, signUp, signOut, markOnboardingStatus]
   )
+
+  // Optionally return a loading state while verifying
+  if (isInitializing) {
+    return <div>Loading...</div> // Or your loading component
+  }
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>
 }
