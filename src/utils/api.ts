@@ -29,10 +29,12 @@ export const apiFetch = async <T>(path: string, init: ApiRequestInit = {}): Prom
   const url = path.startsWith('http') ? path : `${baseUrl}${path}`
   const headers = new Headers(init.headers ?? {})
 
+  // Set Content-Type for JSON bodies
   if (!headers.has('Content-Type') && init.body && !(init.body instanceof FormData)) {
     headers.set('Content-Type', 'application/json')
   }
 
+  // Add authorization token if needed
   if (init.auth ?? true) {
     const token = readAuthToken()
     if (token && !headers.has('Authorization')) {
@@ -40,39 +42,66 @@ export const apiFetch = async <T>(path: string, init: ApiRequestInit = {}): Prom
     }
   }
 
-  const response = await fetch(url, { ...init, headers, credentials: 'include' })
-
-  if (!response.ok) {
-    let message = response.statusText
-    try {
-      const data = await response.json()
-      // Handle FastAPI validation errors (array format)
-      if (Array.isArray(data.detail)) {
-        message = data.detail.map((err: any) => err.msg || JSON.stringify(err)).join(', ')
-      } else if (typeof data.detail === 'string') {
-        message = data.detail
-      } else if (typeof data.detail === 'object') {
-        message = JSON.stringify(data.detail)
-      } else {
-        message = data.message ?? message
-      }
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    } catch (err) {
-      // ignore JSON parsing errors
-    }
-    throw new Error(message)
+  let response: Response
+  try {
+    response = await fetch(url, { ...init, headers, credentials: 'include' })
+  } catch (err) {
+    const errorMsg = err instanceof Error ? err.message : 'Network request failed'
+    console.error('Fetch error:', errorMsg)
+    throw new Error(`Network error: ${errorMsg}`)
   }
 
+  // Handle non-2xx responses
+  if (!response.ok) {
+    let errorMessage = `HTTP ${response.status}: ${response.statusText}`
+    
+    try {
+      const contentType = response.headers.get('Content-Type') ?? ''
+      
+      if (contentType.includes('application/json')) {
+        const data = await response.json()
+        
+        // Handle FastAPI validation errors (array format)
+        if (Array.isArray(data.detail)) {
+          errorMessage = data.detail.map((err: any) => err.msg || JSON.stringify(err)).join(', ')
+        } else if (typeof data.detail === 'string') {
+          errorMessage = data.detail
+        } else if (typeof data.detail === 'object') {
+          errorMessage = JSON.stringify(data.detail)
+        } else if (data.message) {
+          errorMessage = data.message
+        }
+      } else {
+        const text = await response.text()
+        if (text) errorMessage = text
+      }
+    } catch (parseErr) {
+      console.warn('Could not parse error response:', parseErr)
+    }
+    
+    throw new Error(errorMessage)
+  }
+
+  // Handle 204 No Content
   if (response.status === 204) {
     return undefined as T
   }
 
-  const contentType = response.headers.get('Content-Type') ?? ''
-  if (contentType.includes('application/json')) {
-    return (await response.json()) as T
+  // Parse response body
+  try {
+    const contentType = response.headers.get('Content-Type') ?? ''
+    
+    if (contentType.includes('application/json')) {
+      const data = await response.json()
+      return data as T
+    }
+    
+    // Return empty object for non-JSON responses
+    return {} as T
+  } catch (parseErr) {
+    console.error('Failed to parse response:', parseErr)
+    throw new Error(`Failed to parse response: ${parseErr instanceof Error ? parseErr.message : 'Unknown error'}`)
   }
-
-  return undefined as T
 }
 
 export type ProductRecord = {
