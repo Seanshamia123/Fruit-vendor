@@ -6,6 +6,8 @@ import SectionTabs from '../../components/priceManagement/SectionTabs'
 import styles from './RewardRules.module.css'
 import { rewardTips } from './data'
 import { usePriceManagement } from '../../hooks/usePriceManagement'
+import { productApi } from "../../services/api"
+import type { Product } from '../../api/types'
 
 type RewardRulesViewProps = {
   editing?: boolean
@@ -17,6 +19,7 @@ type RuleFormData = {
   condition_value: string
   bonus_type: string
   bonus_value: string
+  product_ids: number[]
 }
 
 const RewardRulesView = ({ editing = false }: RewardRulesViewProps) => {
@@ -34,18 +37,37 @@ const RewardRulesView = ({ editing = false }: RewardRulesViewProps) => {
     handleUpdateBonusRule,
   } = usePriceManagement()
 
+  const [products, setProducts] = useState<Product[]>([])
+  const [loadingProducts, setLoadingProducts] = useState(true)
+
   const [formData, setFormData] = useState<RuleFormData>({
     rule_name: '',
     condition_type: 'sales_value',
     condition_value: '',
     bonus_type: 'percentage',
     bonus_value: '',
+    product_ids: [],
   })
   const [isSaving, setIsSaving] = useState(false)
   const [saveError, setSaveError] = useState<string | null>(null)
 
   const editingRuleId = params.id ? Number(params.id) : null
   const editingRule = editingRuleId ? bonusRules.find((r) => r.id === editingRuleId) : null
+
+  // Fetch products on mount
+  useEffect(() => {
+    const fetchProducts = async () => {
+      try {
+        const data = await productApi.list()
+        setProducts(data)
+      } catch (err) {
+        console.error('Failed to load products:', err)
+      } finally {
+        setLoadingProducts(false)
+      }
+    }
+    fetchProducts()
+  }, [])
 
   // Load rule data when editing
   useEffect(() => {
@@ -56,15 +78,16 @@ const RewardRulesView = ({ editing = false }: RewardRulesViewProps) => {
         condition_value: editingRule.condition_value.toString(),
         bonus_type: editingRule.bonus_type,
         bonus_value: editingRule.bonus_value.toString(),
+        product_ids: (editingRule as any).product_ids || [],
       })
     } else if (editing && !editingRuleId) {
-      // Creating new rule - reset form
       setFormData({
         rule_name: '',
         condition_type: 'sales_value',
         condition_value: '',
         bonus_type: 'percentage',
         bonus_value: '',
+        product_ids: [],
       })
     }
   }, [editing, editingRule, editingRuleId])
@@ -83,12 +106,25 @@ const RewardRulesView = ({ editing = false }: RewardRulesViewProps) => {
     { value: 'free_item', label: 'Free product', hint: 'Drive repeat purchases' },
   ]
 
+  const handleProductToggle = (productId: number) => {
+    setFormData(prev => ({
+      ...prev,
+      product_ids: prev.product_ids.includes(productId)
+        ? prev.product_ids.filter(id => id !== productId)
+        : [...prev.product_ids, productId]
+    }))
+  }
+
   const handleSave = async () => {
     setSaveError(null)
 
-    // Validation
     if (!formData.rule_name.trim()) {
       setSaveError('Please enter a rule name')
+      return
+    }
+
+    if (formData.product_ids.length === 0) {
+      setSaveError('Please select at least one product')
       return
     }
 
@@ -111,19 +147,20 @@ const RewardRulesView = ({ editing = false }: RewardRulesViewProps) => {
 
     setIsSaving(true)
     try {
-      const data = {
+      const payload: any = {
         rule_name: formData.rule_name.trim(),
         condition_type: formData.condition_type,
         condition_value: conditionValue,
         bonus_type: formData.bonus_type,
         bonus_value: bonusValue,
+        product_ids: formData.product_ids,
         is_active: true,
       }
 
       if (editingRuleId) {
-        await handleUpdateBonusRule(editingRuleId, data)
+        await handleUpdateBonusRule(editingRuleId, payload)
       } else {
-        await handleCreateBonusRule(data)
+        await handleCreateBonusRule(payload)
       }
 
       navigate('/price-management/rewards')
@@ -136,14 +173,16 @@ const RewardRulesView = ({ editing = false }: RewardRulesViewProps) => {
 
   const handleDuplicate = async (rule: typeof bonusRules[0]) => {
     try {
-      await handleCreateBonusRule({
+      const dupPayload: any = {
         rule_name: `${rule.rule_name} (Copy)`,
         condition_type: rule.condition_type,
         condition_value: rule.condition_value,
         bonus_type: rule.bonus_type,
         bonus_value: rule.bonus_value,
+        product_ids: (rule as any).product_ids || [],
         is_active: false,
-      })
+      }
+      await handleCreateBonusRule(dupPayload)
     } catch (err) {
       console.error('Failed to duplicate rule:', err)
     }
@@ -261,6 +300,36 @@ const RewardRulesView = ({ editing = false }: RewardRulesViewProps) => {
                       placeholder="e.g., Spend KSh 1000 get 10% off"
                     />
                   </label>
+
+                  {/* Product Selection */}
+                  <div className={styles.inputGroup} style={{ gridColumn: '1 / -1' }}>
+                    <span className={styles.inputLabel}>Apply to products</span>
+                    {loadingProducts ? (
+                      <div style={{ padding: '0.5rem', color: '#666' }}>Loading products...</div>
+                    ) : products.length === 0 ? (
+                      <div style={{ padding: '0.5rem', color: '#999' }}>No products available</div>
+                    ) : (
+                      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(180px, 1fr))', gap: '0.5rem' }}>
+                        {products.map(product => (
+                          <label key={product.id} style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', padding: '0.5rem', background: '#f5f5f5', borderRadius: '0.5rem', cursor: 'pointer' }}>
+                            <input
+                              type="checkbox"
+                              checked={formData.product_ids.includes(product.id)}
+                              onChange={() => handleProductToggle(product.id)}
+                              style={{ cursor: 'pointer' }}
+                            />
+                            <span style={{ fontSize: '0.9rem' }}>{product.name}</span>
+                          </label>
+                        ))}
+                      </div>
+                    )}
+                    {formData.product_ids.length > 0 && (
+                      <div style={{ fontSize: '0.8rem', color: '#666', marginTop: '0.5rem' }}>
+                        {formData.product_ids.length} product(s) selected
+                      </div>
+                    )}
+                  </div>
+
                   <div className={styles.radioGroup}>
                     <span className={styles.radioLabel}>Trigger condition</span>
                     <div className={styles.radioOptions}>
