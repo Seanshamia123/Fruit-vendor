@@ -246,3 +246,43 @@ export type OnboardingData = {
   display_mode?: string
   language?: string
 }
+
+// M-Pesa Types
+export type MpesaSTKPushRequest = {
+  phone_number: string
+  amount: number
+  account_reference?: string
+  transaction_desc?: string
+  product_id?: number
+}
+
+export type MpesaSTKPushResponse = {
+  MerchantRequestID: string
+  CheckoutRequestID: string
+  ResponseCode: string
+  ResponseDescription: string
+  CustomerMessage?: string
+}
+
+export type MpesaTransaction = {
+  id: number
+  merchant_request_id: string
+  checkout_request_id: string
+  amount: number
+  phone_number: string
+  account_reference: string | null
+  response_code: string
+  response_description: string
+  result_code: number | null
+  result_desc: string | null
+  mpesa_receipt: string | null
+  vendor_id: number | null
+  product_id: number | null
+  created_at: string
+  updated_at: string
+}
+
+export type MpesaTransactionEnhanced = MpesaTransaction & {
+  vendor_name: string | null
+  product_name: string | null
+}

@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import Button from '../../components/Button'
 import MainLayout from '../../layouts/MainLayout'
 import { useSalesData } from '../../hooks/useSalesData'
+import { mpesaApi } from '../../services/api'
 import styles from './Sales.module.css'
 import type {
   CartLine,
@@ -168,6 +169,7 @@ const SalesPage = () => {
   const [lastSale, setLastSale] = useState<SaleDetail | null>(null)
   const [mpesaPhone, setMpesaPhone] = useState('')
   const [mpesaPhoneError, setMpesaPhoneError] = useState<string | null>(null)
+  const [mpesaCheckoutRequestId, setMpesaCheckoutRequestId] = useState<string | null>(null)
   const [quantityDrafts, setQuantityDrafts] = useState<Record<string, string>>({})
   const [priceDrafts, setPriceDrafts] = useState<Record<string, string>>({})
 
@@ -566,7 +568,7 @@ const SalesPage = () => {
     handlePaymentSuccess(nextFlow)
   }
 
-  const handleSendMpesaPush = () => {
+  const handleSendMpesaPush = async () => {
     if (!paymentFlow) return
     const normalized = normalizePhoneNumber(mpesaPhone)
     if (!normalized || !isLikelyValidMpesaNumber(normalized)) {
@@ -585,6 +587,42 @@ const SalesPage = () => {
       phoneNumber: normalized,
       errorCode: undefined,
     })
+
+    try {
+      // Get cart details
+      const cart = getSaleCart(paymentFlow)
+      if (!cart) {
+        handlePaymentFailure(paymentFlow, 'ERR_NO_CART')
+        return
+      }
+
+      // Calculate total amount
+      const totalAmount = Object.values(cart).reduce(
+        (sum, line) => sum + line.quantity * line.unitPrice,
+        0
+      )
+
+      // Get first product ID from cart (for tracking purposes)
+      const firstProductId = parseInt(Object.keys(cart)[0])
+
+      // Call M-Pesa STK Push API
+      const response = await mpesaApi.stkPush({
+        phone_number: normalized,
+        amount: Math.round(totalAmount), // M-Pesa requires integer
+        account_reference: `SALE-${Date.now()}`.slice(0, 12), // Max 12 chars
+        transaction_desc: 'Fruits Sale', // Max 13 chars
+        product_id: firstProductId,
+      })
+
+      // Store checkout request ID for polling
+      setMpesaCheckoutRequestId(response.CheckoutRequestID)
+
+      // Continue with processing UI (will poll for completion)
+      console.log('STK Push sent:', response)
+    } catch (error) {
+      console.error('M-Pesa STK Push failed:', error)
+      handlePaymentFailure(paymentFlow, 'ERR_MPESA_FAILED')
+    }
   }
 
   const handlePaymentSuccess = async (flow: PaymentFlow) => {
@@ -674,6 +712,69 @@ const SalesPage = () => {
   useEffect(() => {
     if (paymentFlow?.stage !== 'processing') return
 
+    // For M-Pesa, poll for transaction status instead of auto-completing
+    if (paymentFlow?.method === 'mpesa' && mpesaCheckoutRequestId) {
+      // Poll every 3 seconds for up to 60 seconds
+      const maxAttempts = 20
+      let attempts = 0
+
+      const pollInterval = window.setInterval(async () => {
+        attempts++
+
+        try {
+          const transactions = await mpesaApi.history()
+          const transaction = transactions.find(
+            (tx) => tx.checkout_request_id === mpesaCheckoutRequestId
+          )
+
+          if (transaction) {
+            // Check if transaction is complete
+            if (transaction.result_code !== null) {
+              window.clearInterval(pollInterval)
+
+              if (transaction.result_code === 0) {
+                // Payment successful - backend already created the sale
+                const cart = getSaleCart(paymentFlow)
+                if (cart) {
+                  // Update local state to match backend
+                  const saleDetail = computeSaleDetail(paymentFlow)
+                  if (saleDetail) {
+                    setLastSale(saleDetail)
+                    setPaymentFlow({ ...paymentFlow, stage: 'success' })
+                    setProcessingStep(0)
+                    setMpesaCheckoutRequestId(null)
+
+                    // Refresh inventory from backend
+                    setTimeout(() => window.location.reload(), 2000)
+                  }
+                }
+              } else {
+                // Payment failed - log the actual error from M-Pesa
+                console.log('M-Pesa payment failed:', {
+                  result_code: transaction.result_code,
+                  result_desc: transaction.result_desc,
+                })
+                handlePaymentFailure(paymentFlow, 'ERR_MPESA_DECLINED')
+                setMpesaCheckoutRequestId(null)
+              }
+            }
+          }
+
+          // Timeout after max attempts
+          if (attempts >= maxAttempts) {
+            window.clearInterval(pollInterval)
+            handlePaymentFailure(paymentFlow, 'ERR_MPESA_TIMEOUT')
+            setMpesaCheckoutRequestId(null)
+          }
+        } catch (error) {
+          console.error('Failed to poll M-Pesa status:', error)
+        }
+      }, 3000)
+
+      return () => window.clearInterval(pollInterval)
+    }
+
+    // For non-M-Pesa payments, use original logic
     if (processingStep >= 3) {
       const timeout = window.setTimeout(() => {
         handleProcessingComplete()
@@ -686,7 +787,7 @@ const SalesPage = () => {
     }, 2200)
 
     return () => window.clearTimeout(timeout)
-  }, [handleProcessingComplete, paymentFlow, processingStep])
+  }, [handleProcessingComplete, paymentFlow, processingStep, mpesaCheckoutRequestId])
 
   const closePaymentFlow = () => {
     setPaymentFlow(null)
@@ -694,6 +795,7 @@ const SalesPage = () => {
     setProcessingSeconds(0)
     setMpesaPhone('')
     setMpesaPhoneError(null)
+    setMpesaCheckoutRequestId(null)
   }
 
   const proceedToSaleComplete = () => {
@@ -1673,9 +1775,30 @@ const SalesPage = () => {
           </div>
 
           <div>
-            <div className={styles.sectionTitle}>Insufficient Funds</div>
-            <p>Customer does not have enough balance in their M-Pesa account.</p>
-            <p className={styles.paymentSubtitle}>Recommended action: Ask customer to top up their M-Pesa account.</p>
+            <div className={styles.sectionTitle}>
+              {flow.errorCode === 'ERR_MPESA_DECLINED' && 'Payment Declined'}
+              {flow.errorCode === 'ERR_MPESA_TIMEOUT' && 'Payment Timeout'}
+              {flow.errorCode === 'ERR_MPESA_FAILED' && 'Connection Failed'}
+              {flow.errorCode === 'ERR_CUSTOMER_CANCELLED' && 'Customer Cancelled'}
+              {!flow.errorCode && 'Payment Failed'}
+            </div>
+            <p>
+              {flow.errorCode === 'ERR_MPESA_DECLINED' &&
+                'Customer may have insufficient balance, entered wrong PIN, or cancelled the payment on their phone.'}
+              {flow.errorCode === 'ERR_MPESA_TIMEOUT' &&
+                'Customer did not complete the payment within the time limit (60 seconds).'}
+              {flow.errorCode === 'ERR_MPESA_FAILED' &&
+                'Could not connect to M-Pesa. Check your internet connection and try again.'}
+              {flow.errorCode === 'ERR_CUSTOMER_CANCELLED' && 'Payment was cancelled before completion.'}
+              {!flow.errorCode && 'Transaction could not be completed. Please try again.'}
+            </p>
+            <p className={styles.paymentSubtitle}>
+              {flow.errorCode === 'ERR_MPESA_DECLINED' &&
+                'Recommended: Ask customer to check their M-Pesa balance or try a smaller amount.'}
+              {flow.errorCode === 'ERR_MPESA_TIMEOUT' &&
+                'Recommended: Ensure customer has their phone nearby and can complete payment quickly.'}
+              {flow.errorCode === 'ERR_MPESA_FAILED' && 'Recommended: Check internet connection and try again.'}
+            </p>
           </div>
 
           <div>
