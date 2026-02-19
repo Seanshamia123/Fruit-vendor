@@ -6,7 +6,7 @@ import SectionTabs from '../../components/priceManagement/SectionTabs'
 import styles from './RewardRules.module.css'
 import { rewardTips } from './data'
 import { usePriceManagement } from '../../hooks/usePriceManagement'
-import { productApi } from "../../services/api"
+import { productApi } from '../../services/api'
 import type { Product } from '../../api/types'
 
 type RewardRulesViewProps = {
@@ -455,6 +455,17 @@ const RewardRulesView = ({ editing = false }: RewardRulesViewProps) => {
                             <span className={styles.detailLabel}>Reward</span>
                             <span className={styles.detailValue}>{rule.reward}</span>
                           </div>
+                        </div>
+                        <div className={styles.detailColumn}>
+                          <span className={styles.detailLabel}>Applied To Products</span>
+                          <span className={styles.detailValue}>
+                            {backendRule?.product_ids && backendRule.product_ids.length > 0
+                              ? products
+                                  .filter(p => backendRule.product_ids.includes(p.id))
+                                  .map(p => p.name)
+                                  .join(', ')
+                              : 'No products'}
+                          </span>
                         </div>
                         <span className={styles.ruleFooter}>
                           Created {rule.createdOn} · Applied {rule.appliedCount} times
