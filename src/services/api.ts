@@ -27,6 +27,10 @@ import type {
   BonusRuleCreate,
   Payment,
   PaymentCreate,
+  MpesaSTKPushRequest,
+  MpesaSTKPushResponse,
+  MpesaTransaction,
+  MpesaTransactionEnhanced,
 } from './types'
 
 // ==================== AUTH API ====================
@@ -284,4 +288,20 @@ export const preferenceApi = {
       method: 'PUT',
       body: JSON.stringify(data),
     }),
+}
+
+// ==================== M-PESA API ====================
+export const mpesaApi = {
+  stkPush: (data: MpesaSTKPushRequest) =>
+    apiFetch<MpesaSTKPushResponse>('/mpesa/stk-push', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    }),
+
+  history: () => apiFetch<MpesaTransaction[]>('/mpesa/history'),
+
+  historyEnhanced: () => apiFetch<MpesaTransactionEnhanced[]>('/mpesa/history/enhanced'),
+
+  getTransaction: (checkoutRequestId: string) =>
+    apiFetch<MpesaTransaction>(`/mpesa/history?checkout_request_id=${checkoutRequestId}`),
 }
