@@ -1,6 +1,6 @@
 export type ApiRequestInit = RequestInit & { auth?: boolean }
 
-const DEFAULT_BASE_URL = 'http://localhost:8000'
+const DEFAULT_BASE_URL = 'https://fruit-vendor.onrender.com'
 
 const getBaseUrl = () => {
   if (typeof window === 'undefined') return DEFAULT_BASE_URL
