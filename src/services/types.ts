@@ -218,7 +218,7 @@ export type BonusRuleCreate = {
   condition_value: number
   bonus_type: string
   bonus_value: number
-  product_ids: number[]
+  product_ids?: number[]
   is_active?: boolean
 }
 
