@@ -9,7 +9,7 @@ from dotenv import load_dotenv
 load_dotenv()
 
 # Test without authentication to see which endpoints respond
-BASE_URL = "http://127.0.0.1:8000"
+BASE_URL = "https://fruit-vendor.onrender.com"
 
 endpoints = [
     "/products",
